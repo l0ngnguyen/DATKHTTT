@@ -1,0 +1,98 @@
+.container {
+    min-width: 100%;
+    margin: 0;
+    padding: 0;
+
+    .homepage {
+        max-width: 1200px;
+        padding: 100px 0px;
+        box-sizing: border-box;
+        margin: 0px auto;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .first {
+            display: flex;
+            align-items: center;
+
+            .where-all {
+                font-weight: bold;
+                font-size: 96px;
+                display: flex;
+                color: #000000;
+                margin-right: 18px;
+            }
+
+            .question {
+                font-weight: bold;
+                font-size: 96px;
+                background: -webkit-linear-gradient(30deg, #007CF0, #00DFD8);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+        }
+
+        .have {
+            font-weight: bold;
+            font-size: 96px;
+            display: flex;
+            color: #000000;
+            margin: 12px 0px;
+        }
+
+        .answer {
+            font-weight: bold;
+            font-size: 96px;
+            background: -webkit-linear-gradient(30deg, #7928CA, #FF0080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .groupButton {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 60px;
+            padding-bottom: 100px;
+
+            .button {
+                width: 208px;
+                padding: 14px 0px;
+                box-sizing: border-box;
+                text-align: center;
+                color: #FFFFFF;
+                background-color: #000000;
+                border-radius: 8px;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.85);
+                    transition-duration: 0.35s;
+                }
+
+                &:active {
+                    background-color: rgba(0, 0, 0, 0.7);
+                    transition-duration: 0.35s;
+                }
+            }
+
+            .button1 {
+                @extend .button;
+                color: #000000;
+                background-color: #FFFFFF;
+                border: 1.3px solid #000000;
+                margin-left: 30px;
+
+                &:hover {
+                    color: #FFFFFF;
+                }
+            }
+        }
+    }
+}

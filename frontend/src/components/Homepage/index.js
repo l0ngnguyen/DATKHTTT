@@ -1,12 +1,12 @@
 import React from 'react';
 import Home from './Home';
-import Layout from './Home';
+import Layout from '../common/Layout';
 
-const Homepage = (props) => {
+const Homepage = () => {
     return (
-        <Layout>
-            <Home />
-        </Layout>
+       <Layout>
+           <Home />
+       </Layout>
     )
 }
 
