@@ -1,0 +1,29 @@
+.footer {
+    width: 100vw;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+
+    .top {
+        background: #333333;
+        padding: 30px;
+
+        .container {
+            max-width: 1200px;
+            margin: 0px auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    }
+
+    .bottom {
+        background: rgba(0, 0, 0, 0.9);
+        text-align: center;
+        padding: 14px;
+
+        .container {
+            max-width: 1200px;
+            margin: 0px auto;
+        }
+    }
+}
