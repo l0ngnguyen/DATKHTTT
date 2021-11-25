@@ -1,5 +1,6 @@
 import React from "react";
 import './App.scss';
+import 'antd/dist/antd.css';
 import Homepage from "./components/Homepage";
 
 import {

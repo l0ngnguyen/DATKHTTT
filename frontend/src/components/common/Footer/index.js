@@ -11,7 +11,7 @@ const Footer = () => {
             <div className={cx("top")}>
                 <div className={cx("container")}>
                     <div>
-                        <h3>CONTACT:</h3>
+                        <p><b>CONTACT :</b></p>
                         <div>Email: da.tkhttt20211@soict.hust.edud.vn</div>
                         <p>Github: DATTHTTT.github.io</p>
                     </div>
