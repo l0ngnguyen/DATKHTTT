@@ -28,9 +28,18 @@ exports.createUser = (user) => {
         description: user.description,
         date: user.date,
         role: user.role,
+        googleId: user.googleId
     })
 }
 
 exports.getAvatar = (userId) => {
     return knex('User').select("avatarLink").where('Id', userId).first()
+}
+
+exports.updatePassword = (Id, newPassword) => {
+    return knex('User').where('Id', Id).update('password', newPassword)
+}
+
+exports.getUserByGoogleID = (googleId) => {
+    return knex('User').where('googleId', googleId).first()
 }

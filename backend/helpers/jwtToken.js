@@ -7,6 +7,8 @@ exports.generateToken = function (user, secretSignature, tokenLife) {
       Id: user.Id,
       userName: user.username,
       role: user.acctype,
+      email:user.email,
+      googleId: user.googleId
     }
     // Thực hiện ký và tạo token
     jwt.sign(
