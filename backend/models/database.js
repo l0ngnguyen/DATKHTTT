@@ -7,7 +7,13 @@ const knex = require('knex')({
         user: config.userDB,
         password: config.passwordDB,
         database: config.db,
-        timezone: "+00:00"
+        timezone: "+00:00",
+        // typeCast: function(field, next) {
+        //     if (field.type == 'TINY' && field.length == 1) {
+        //         return (field.string() == '1'); // 1 = true, 0 = false
+        //     }
+        //     return next();
+        // }
     },
     acquireConnectionTimeout: 30000
 });

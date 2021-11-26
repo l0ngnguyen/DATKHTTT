@@ -18,7 +18,7 @@ exports.seed = function (knex) {
           githubLink: "",
           location: "Ha Noi",
           description: "Admin account",
-          role: 2,
+          role: 1,
         },
       ]);
     });

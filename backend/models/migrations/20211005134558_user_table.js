@@ -11,7 +11,7 @@ exports.up = function (knex) {
     table.string('location', 256);
     table.string('description', 256);
     table.timestamp('date').defaultTo(knex.fn.now());
-    table.integer('role').notNullable().defaultTo(1); //0 is admin, 1 is user
+    table.integer('role').notNullable().defaultTo(1); //1 is admin, 0 is user
     table.string('googleId',256)
     table.unique('userName');
     table.unique('email');
