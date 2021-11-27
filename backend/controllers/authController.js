@@ -11,9 +11,8 @@ let otpList = {}
 
 exports.login = async function (req, res) {
     try {
-        console.log(req.body)
-        let user = await User.getUserByUserName(req.body.username)
-
+        //login với username/email và password
+        let user = await User.getUserByUserName(req.body.username) || await User.getUserByEmail(req.body.username)
         if (!user) {
             res.status(401).json({
                 success: false,
@@ -100,8 +99,8 @@ exports.logOut = function (req, res) {
         })
     }
 };
-exports.sendOtp = async (req, res) => {
-    // option của tài khoản gửi email cho người dùng
+exports.sendOtpForgetPassword = async (req, res) => {
+    // option của tài khoản gửi email cho người dùng để lấy lại mật khẩu
     const emailOption = {
         service: config.emailService,
         auth: {
@@ -149,7 +148,6 @@ exports.sendOtp = async (req, res) => {
                             let otpToken = await jwtHelper.generateToken(data, config.otpTokenSecret, config.otpTokenLife);
                             tokenList[otpToken] = data
                             otpList[user.email] = otp
-                            console.log(user.email)
 
                             return res.status(200).json({
                                 success: true,
@@ -168,14 +166,14 @@ exports.sendOtp = async (req, res) => {
         });
     }
 };
-exports.checkOtp = async (req, res) => {
+exports.checkOtpForgetPassword = async (req, res) => {
     const otpToken = req.body.otpToken
     if (otpToken && tokenList[otpToken]) {
         try {
             // decode data của user đã mã hóa vào otpToken
             const data = await jwtHelper.verifyToken(otpToken, config.otpTokenSecret);
             if (data && (req.body.otp == otpList[data.email])) {
-                console.log(data.email)
+
                 let accessToken = await jwtHelper.generateToken(data, config.accessTokenSecret, config.accessTokenLife);
                 tokenList[accessToken] = data
                 return res.json({
@@ -248,7 +246,7 @@ exports.loginWithGoogle = async (req, res) => {
             audience: config.googleClientID
         })
         payload = ticket.getPayload()
-    } catch (error){
+    } catch (error) {
         return res.status(500).json({
             success: false,
             message: "Verity google token failed"
@@ -287,6 +285,210 @@ exports.loginWithGoogle = async (req, res) => {
     }
 }
 
+exports.signUpWithGoogle = async (req, res) => {
+    //đăng ký bằng tài khoản google, gửi google ID lên, trả về 1 access token cho google ID của tài khoản, sau đó dùng access token này gửi lên 1 lần nữa để đăng ký cho tài khoản này
+    let payload;
+    try {
+        const ticket = await OAuthClient.verifyIdToken({
+            idToken: req.body.idToken,
+            audience: config.googleClientID
+        })
+        payload = ticket.getPayload()
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Verity google token failed"
+        });
+    }
+    try {
+        const { sub, email } = payload;
+        let user = await User.getUserByGoogleID(sub) || await User.getUserByEmail(email)
+        if (user) {
+            //nếu tồn tại tài khoản có email bằng email google thì link tài khoản đó với tài khoản google và cho phép đăng nhập luôn 
+            if (!user.googleId) {
+                //update google iD 
+                let res = await User.editUser({ googleId: sub }, user.Id)
+            }
+
+            //có tài khoản hệ thống đã tạo bằng email/google account này rồi thì cho phép đăng nhập luôn
+            let accessToken = await jwtHelper.generateToken(user, config.accessTokenSecret, config.accessTokenLife);
+            let refreshToken = await jwtHelper.generateToken(user, config.refreshTokenSecret, config.refreshTokenLife)
+            tokenList[refreshToken] = { accessToken, refreshToken };
+            res.cookie('refreshToken', refreshToken, { secure: false, httpOnly: true, maxAge: config.refreshTokenCookieLife });
+
+            return res.status(200).json({
+                success: false,
+                exist: true,
+                message: "Already sign up with this google account, link user with this google account ",
+                accessToken: accessToken,
+                ...payload
+            })
+            //chưa có tài khoản thì trả về access token cho googleId 
+        } else {
+            let user = { email: email, googleId: sub }
+            let accessToken = await jwtHelper.generateToken(user, config.accessTokenSecret, config.accessTokenLife);
+            tokenList[accessToken] = user;
+
+            return res.status(200).json({
+                success: true,
+                exist: false,
+                accessToken: accessToken,
+                message: "Can create account with this google account, please sign up with this access token",
+                ...payload
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+exports.sendOtpSignUp = async (req, res) => {
+    //gửi Otp vào email khi tạo tài khoản bằng email, gửi email lên,  trả về Otp token
+    const emailOption = {
+        service: config.emailService,
+        auth: {
+            user: config.emailUser,
+            pass: config.emailPassword
+        }
+    };
+    let transporter = nodemailer.createTransport(emailOption);
+    try {
+        let email = req.body.email;
+        const user = await User.getUserByEmail(email);
+        if (user) {
+            return res.status(400).json({
+                success: false,
+                message: "Email already use, can not use  email to register new account"
+            });
+        } else {
+            transporter.verify(async function (error, success) {
+                if (error) {
+                    return res.status(535).json({
+                        success: false,
+                        message: error.message || "Some errors occur while sending email"
+                    });
+                } else {
+
+                    let otp = Math.floor(100000 + Math.random() * 900000);
+
+                    let mail = {
+                        from: config.emailUser,
+                        to: email,
+                        subject: 'Xác thực tạo tài khoản Hệ thống hỏi đáp trực tuyến Heap Overflow',
+                        text: 'Mã xác thực của bạn là ' + otp + '. Mã này có hiệu lực trong vòng 3 phút',
+                    };
+                    transporter.sendMail(mail, async function (error, info) {
+                        if (error) {
+                            return res.status(535).json({
+                                success: false,
+                                message: error.message || "Some errors occur while sending email"
+                            });
+                        } else {
+                            let data = { email: email }
+
+                            //tạo otptoken để check thời gian tồnt ại của otp token
+                            let otpToken = await jwtHelper.generateToken(data, config.otpTokenSecret, config.otpTokenLife);
+                            tokenList[otpToken] = data
+                            otpList[data.email] = otp
+
+                            return res.status(200).json({
+                                success: true,
+                                otpToken: otpToken
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Some errors occur while sending email"
+        });
+    }
+}
+exports.checkOtpSignUp = async (req, res) => {
+    //check Otp và Otp token còn hạn không, gửi Otp và Otp token lên, trả về access token  cho username, email,... đã đăng ký; sau đấy dùng access token này để đăng ký cho tài khoản
+    const otpToken = req.body.otpToken
+    if (otpToken && tokenList[otpToken]) {
+        try {
+            // decode data của user đã mã hóa vào otpToken
+            const data = await jwtHelper.verifyToken(otpToken, config.otpTokenSecret);
+            if (data && (req.body.otp == otpList[data.email])) {
+
+                let accessToken = await jwtHelper.generateToken(data, config.accessTokenSecret, config.accessTokenLife);
+                tokenList[accessToken] = data
+                return res.json({
+                    success: true,
+                    accessToken: accessToken
+                });
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid OTP",
+                });
+            }
+
+        } catch (error) {
+            // otp hết hạn
+            return res.status(400).json({
+                success: false,
+                message: error.message || "Invalid OTP",
+            });
+        }
+    } else {
+
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid otp token provided',
+        });
+    }
+}
+
+exports.signUp = async (req, res) => {
+    //đăng ký tài khoản, gửi thông tin của ngườI dùng và access token lên để xác thực, sau đó tiến hành thêm tài khoản vào hệ thống, access token và refresh token
+    const accessToken = req.body.accessToken
+    try {
+        const data = await jwtHelper.verifyToken(accessToken, config.accessTokenSecret);
+
+        if (data.email != req.body.email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please check your request email to match with email in access token'
+            });
+        } else {
+            let user = req.body
+            user.accessToken = undefined
+            user.password = await bcrypt.hash(user.password, config.saltRounds)
+
+            user.Id = await User.createUser({ ...user, googleId: data.googleId })
+
+            //phương thức insert của  knex nó trả về 1 mảng title nếu thành công
+
+            let accessToken = await jwtHelper.generateToken(user, config.accessTokenSecret, config.accessTokenLife)
+
+            let refreshToken = await jwtHelper.generateToken(user, config.refreshTokenSecret, config.refreshTokenLife)
+
+            tokenList[refreshToken] = { accessToken, refreshToken };
+
+            res.cookie('refreshToken', refreshToken, { secure: false, httpOnly: true, maxAge: config.refreshTokenCookieLife });
+            return res.status(200).json({
+                success: true,
+                accessToken: accessToken,
+            })
+
+
+        }
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error
+        })
+    }
+}
 
 
 
