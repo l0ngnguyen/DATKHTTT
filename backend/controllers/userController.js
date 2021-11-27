@@ -140,3 +140,13 @@ exports.getAvatar = async function (req, res) {
         })
     }
 }
+exports.signUpWithGoogle = async (req, res) => {
+    //đăng ký bằng tài khoản google, gửi google ID lên, trả về 1 access token cho email của tài khoản, sau đó dùng access token này gửi lên 1 lần nữa để đăng ký cho tài khoản này
+}
+exports.sentOtp = async (req, res) => {
+    //gửi Otp vào email khi tạo tài khoản bằng email, gửi email, username lên  lên,  trả về Otp token
+}
+exports.checkOtp = async (req, res) => {
+    //check Otp và Otp token còn hạn không, gửi Otp và Otp token lên, trả về access token  cho username, email,... đã đăng ký; sau đấy dùng access token này để đăng ký cho tài khoản
+}
+
