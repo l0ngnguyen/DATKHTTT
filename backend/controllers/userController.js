@@ -4,10 +4,11 @@ const User = require('../models/User')
 const config = require('../config/config')
 
 
-exports.getUser = async function (req, res){
+
+exports.getUser = async function (req, res) {
     try {
         let user = await User.getUser(req.params.id)
-    
+
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -28,7 +29,7 @@ exports.getUser = async function (req, res){
     }
 }
 
-exports.getUserByUserName = async function (req, res){
+exports.getUserByUserName = async function (req, res) {
     try {
         let user = await User.getUserByUserName(req.params.username)
         if (!user) {
@@ -51,7 +52,7 @@ exports.getUserByUserName = async function (req, res){
     }
 }
 
-exports.getUserByEmail = async function (req, res){
+exports.getUserByEmail = async function (req, res) {
     try {
         let user = await User.getUserByEmail(req.params.email)
         if (!user) {
@@ -73,8 +74,11 @@ exports.getUserByEmail = async function (req, res){
     }
 }
 
-exports.createUser = async function (req, res){
+exports.createUser = async function (req, res) {
     try {
+
+        //phần này là để admin controller, phải authen role của tài khoản trước
+
         let user = req.body
         user.password = await bcrypt.hash(user.password, config.saltRounds)
 
@@ -89,14 +93,14 @@ exports.createUser = async function (req, res){
             success: true,
             result: newUser,
         })
-    } catch (error){
-        console.log(error)
+    } catch (error) {
         return res.status(500).json({
             success: false,
             message: error
         })
     }
 }
+
 exports.uploadImage = async function (req, res) {
     try {
         if (req.file == undefined) {
@@ -140,13 +144,21 @@ exports.getAvatar = async function (req, res) {
         })
     }
 }
-exports.signUpWithGoogle = async (req, res) => {
-    //đăng ký bằng tài khoản google, gửi google ID lên, trả về 1 access token cho email của tài khoản, sau đó dùng access token này gửi lên 1 lần nữa để đăng ký cho tài khoản này
-}
-exports.sentOtp = async (req, res) => {
-    //gửi Otp vào email khi tạo tài khoản bằng email, gửi email, username lên  lên,  trả về Otp token
-}
-exports.checkOtp = async (req, res) => {
-    //check Otp và Otp token còn hạn không, gửi Otp và Otp token lên, trả về access token  cho username, email,... đã đăng ký; sau đấy dùng access token này để đăng ký cho tài khoản
-}
+exports.linkWithGoogleAccount = async (req, res) => {
+    //dùng để liên kết tài khoản google với tài khoản hiện tại 
+    //gửi email lên 
+    try {
+        //console.log(req.jwtDecoded)
+        let count = await User.editUser({ googleId: req.body.googleId }, req.jwtDecoded.Id)
 
+        return res.status(200).json({
+            success: true,
+        })
+    } catch (error) {
+        //console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error
+        })
+    }
+}
