@@ -43,3 +43,9 @@ exports.updatePassword = (Id, newPassword) => {
 exports.getUserByGoogleID = (googleId) => {
     return knex('User').where('googleId', googleId).first()
 }
+
+exports.editUser = (data, Id) => {
+    return knex('User').where('Id', Id).update({
+        ...data
+    })
+}
