@@ -132,7 +132,7 @@ exports.sendOtpForgetPassword = async (req, res) => {
                     let mail = {
                         from: config.emailUser,
                         to: email,
-                        subject: 'Xác thực tài khoản Hệ thống hỏi đáp trực tuyến Heap Overflow',
+                        subject: 'Xác thực quên mật khẩu tài khoản Hệ thống hỏi đáp trực tuyến Heap Overflow',
                         text: 'Mã xác thực của bạn là ' + otp + '. Mã này có hiệu lực trong vòng 3 phút',
                     };
                     transporter.sendMail(mail, async function (error, info) {
@@ -253,18 +253,28 @@ exports.loginWithGoogle = async (req, res) => {
         });
     }
     try {
-        const { sub } = payload;
-        let user = await User.getUserByGoogleID(sub)
+        const { sub, email } = payload;
+        let user = await User.getUserByGoogleID(sub) || await User.getUserByEmail(email)
+        //nếu user ko tồn tại thì ko cho phép đăng nhập, mà chuyển sang trang đăng ký, trả về một accessToken cho phép đăng ký
         if (!user) {
+            let user = { email: email, googleId: sub }
+            let accessToken = await jwtHelper.generateToken(user, config.accessTokenSecret, config.accessTokenLife);
+            tokenList[accessToken] = user;
+            
             return res.status(200).json({
-                //yêu cầu người dùng tạo tài khoản
-                //thêm chức năng liên kết tài khoản với tài khoản google
                 success: true,
                 exist: false,
-                message: "User does not exist",
+                accessToken: accessToken,
+                message: "User does not exist, please sign up",
                 ...payload
             })
+            //nếu có tồn tại user
         } else {
+            //nếu email của tài khoản hệ thống trùng với mail của google account thì liên kết tài khoản với google luôn rồi đăng nhập ngay
+            if (!user.googleId) {
+                //update google iD để kết nối tài khoản hệ thống vs tài khoản google 
+                let res = await User.editUser({ googleId: sub }, user.Id)
+            }
             let accessToken = await jwtHelper.generateToken(user, config.accessTokenSecret, config.accessTokenLife);
             let refreshToken = await jwtHelper.generateToken(user, config.refreshTokenSecret, config.refreshTokenLife)
             tokenList[refreshToken] = { accessToken, refreshToken };
@@ -286,7 +296,7 @@ exports.loginWithGoogle = async (req, res) => {
 }
 
 exports.signUpWithGoogle = async (req, res) => {
-    //đăng ký bằng tài khoản google, gửi google ID lên, trả về 1 access token cho google ID của tài khoản, sau đó dùng access token này gửi lên 1 lần nữa để đăng ký cho tài khoản này
+    //đăng ký bằng tài khoản google, gửi google TokenID lên, trả về 1 access token cho google ID của tài khoản, sau đó dùng access token này gửi lên 1 lần nữa để đăng ký cho tài khoản này
     let payload;
     try {
         const ticket = await OAuthClient.verifyIdToken({
@@ -306,11 +316,11 @@ exports.signUpWithGoogle = async (req, res) => {
         if (user) {
             //nếu tồn tại tài khoản có email bằng email google thì link tài khoản đó với tài khoản google và cho phép đăng nhập luôn 
             if (!user.googleId) {
-                //update google iD 
+                //update google iD để kết nối tài khoản hệ thống vs tài khoản google 
                 let res = await User.editUser({ googleId: sub }, user.Id)
             }
 
-            //có tài khoản hệ thống đã tạo bằng email/google account này rồi thì cho phép đăng nhập luôn
+            //có tài khoản hệ thống đã tạo bằng google account này rồi thì cho phép đăng nhập luôn
             let accessToken = await jwtHelper.generateToken(user, config.accessTokenSecret, config.accessTokenLife);
             let refreshToken = await jwtHelper.generateToken(user, config.refreshTokenSecret, config.refreshTokenLife)
             tokenList[refreshToken] = { accessToken, refreshToken };
@@ -319,11 +329,11 @@ exports.signUpWithGoogle = async (req, res) => {
             return res.status(200).json({
                 success: false,
                 exist: true,
-                message: "Already sign up with this google account, link user with this google account ",
+                message: "Already sign up with this google account, link user to this google account ",
                 accessToken: accessToken,
                 ...payload
             })
-            //chưa có tài khoản thì trả về access token cho googleId 
+            //chưa có tài khoản thì trả về access token cho googleId và email (google)
         } else {
             let user = { email: email, googleId: sub }
             let accessToken = await jwtHelper.generateToken(user, config.accessTokenSecret, config.accessTokenLife);
@@ -426,6 +436,7 @@ exports.checkOtpSignUp = async (req, res) => {
                     accessToken: accessToken
                 });
             } else {
+                //người dùng nhập sai OTP
                 return res.status(400).json({
                     success: false,
                     message: "Invalid OTP",
@@ -433,14 +444,14 @@ exports.checkOtpSignUp = async (req, res) => {
             }
 
         } catch (error) {
-            // otp hết hạn
+            // OTP không hợp lệ do hết hạn
             return res.status(400).json({
                 success: false,
                 message: error.message || "Invalid OTP",
             });
         }
     } else {
-
+        //sai OTP token
         return res.status(400).json({
             success: false,
             message: 'Invalid otp token provided',
@@ -465,8 +476,8 @@ exports.signUp = async (req, res) => {
             user.password = await bcrypt.hash(user.password, config.saltRounds)
 
             user.Id = await User.createUser({ ...user, googleId: data.googleId })
-
-            //phương thức insert của  knex nó trả về 1 mảng title nếu thành công
+            user = await User.getUser(user.Id);
+            //phương thức insert của  knex nó trả về 1 mảng id nếu thành công
 
             let accessToken = await jwtHelper.generateToken(user, config.accessTokenSecret, config.accessTokenLife)
 
