@@ -37,7 +37,7 @@ exports.login = async function (req, res) {
         return res.status(200).json({
             success: true,
             accessToken,
-            id: user.Id,
+            userId: user.Id,
         });
 
     } catch (err) {
@@ -279,12 +279,13 @@ exports.loginWithGoogle = async (req, res) => {
             let refreshToken = await jwtHelper.generateToken(user, config.refreshTokenSecret, config.refreshTokenLife)
             tokenList[refreshToken] = { accessToken, refreshToken };
             res.cookie('refreshToken', refreshToken, { secure: false, httpOnly: true, maxAge: config.refreshTokenCookieLife });
+            
             return res.status(200).json({
                 success: true,
                 exist: true,
                 accessToken: accessToken,
                 message: "Login successfully",
-                userId: user.userId,
+                userId: user.Id,
                 ...payload
             })
         }
@@ -332,7 +333,7 @@ exports.signUpWithGoogle = async (req, res) => {
                 exist: true,
                 message: "Already sign up with this google account, link user to this google account ",
                 accessToken: accessToken,
-                userId: user.userId,
+                userId: user.Id,
                 ...payload
             })
             //chưa có tài khoản thì trả về access token cho googleId và email (google)
