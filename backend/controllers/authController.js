@@ -284,6 +284,7 @@ exports.loginWithGoogle = async (req, res) => {
                 exist: true,
                 accessToken: accessToken,
                 message: "Login successfully",
+                userId: user.userId,
                 ...payload
             })
         }
@@ -331,6 +332,7 @@ exports.signUpWithGoogle = async (req, res) => {
                 exist: true,
                 message: "Already sign up with this google account, link user to this google account ",
                 accessToken: accessToken,
+                userId: user.userId,
                 ...payload
             })
             //chưa có tài khoản thì trả về access token cho googleId và email (google)
