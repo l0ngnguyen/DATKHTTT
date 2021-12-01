@@ -1,39 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './index.module.scss';
 import cn from "classnames/bind";
 import HeaderLogin from '../common/Header/HeaderDestop/HeaderLogin';
 import logo from "../../images/logo.png";
-import { Form, Input, Checkbox, Button, Divider, message } from 'antd';
+import {
+    Form,
+    Input,
+    Checkbox,
+    Button,
+    Divider,
+    message,
+    Modal,
+} from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { GoogleLogin } from 'react-google-login';
 import { Link, useHistory } from "react-router-dom";
+import axios from 'axios';
 
 const cx = cn.bind(styles);
 
-const Login = () => {
-    // const history = useHistory();
+const SignUpModal = () => {
+    const history = useHistory();
 
-    const responseGoogle = async (response) => {
-        console.log(response);
-        // const data = {
-        //     "idToken": response.tokenId,
-        // }
+    const onFinish = async (value) => {
+        const data = {
+            'userName': value.username,
+            'email': value.email,
+            'password': value.password,
+        }
 
-        // try {
-        //     const res = await axios.post(`${URL}/api/Account/gg-authenticate`, data);
-        //     if (res.status === 200) {
-        //         window.localStorage.setItem("token-lingo", res.data.token);
-        //         message.success('Login success');
-        //         history.push("/");
-        //     }
-        // } catch (err) {
-        //     console.log(err.response);
-        // }
-    }
+        try {
+            const res = await axios.post(`http://localhost:3001/auth/sign-up/send-otp`, {
+                'email': data.email,
+            });
+            if (res.status === 200) {
 
-
-    const onFinish = (value) => {
-        console.log('Success:', value);
+            }
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -42,7 +47,6 @@ const Login = () => {
 
     return (
         <>
-            <HeaderLogin isLogin={true} />
             <div className={cx("container")}>
                 <div className={cx("login")}>
                     <div className={cx("top")}>
@@ -53,6 +57,7 @@ const Login = () => {
                         </div>
                     </div>
                     <div className={cx("form")}>
+                        <div><b>You can skip this step and sign up now!</b></div>
                         <Form
                             name="basic"
                             initialValues={{ remember: true, username: "", password: "" }}
@@ -69,35 +74,31 @@ const Login = () => {
                             </Form.Item>
 
                             <Form.Item
+                                name="email"
+                                rules={[
+                                    { type: 'email' },
+                                    { required: true, message: 'Please input your username!' }
+                                ]}
+                            >
+                                <Input placeholder="Email" />
+                            </Form.Item>
+
+                            <Form.Item
                                 name="password"
                                 rules={[{ required: true, message: 'Please input your password!' }]}
                             >
                                 <Input.Password placeholder="Password" />
                             </Form.Item>
-                            <div className={cx("forgot")}>Forgot password</div>
-
-                            {/* <Form.Item name="remember" valuePropName="checked" >
-                                <Checkbox>I agree to the <a>terms</a> and conditions</Checkbox>
-                            </Form.Item> */}
 
                             <Form.Item >
-                                <div htmlType="submit" className={cx("button")}>
-                                    SIGN IN
-                                </div>
+                                <Button
+                                    htmlType="submit"
+                                    className={cx("button")}
+                                >
+                                    SIGN UP
+                                </Button>
                             </Form.Item>
                         </Form>
-                        <Divider>or</Divider>
-                        <GoogleLogin
-                            clientId="846925863530-akeqgusm19k4dgicm7ncbl1jlsdi48m2.apps.googleusercontent.com"
-                            onSuccess={responseGoogle}
-                            onFailure={responseGoogle}
-                            cookiePolicy={'single_host_origin'}
-                            buttonText="Continue with Google"
-                            style={{ width: "100%" }}
-                        /><br /><br />
-                        <div className={cx("subTitle")}>
-                            <Link to="/sign-up">Sign up</Link> for Stack overflow account
-                        </div>
                     </div>
                 </div>
             </div>
@@ -105,5 +106,5 @@ const Login = () => {
     )
 }
 
-export default Login;
+export default SignUpModal;
 

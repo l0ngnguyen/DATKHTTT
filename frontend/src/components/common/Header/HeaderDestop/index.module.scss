@@ -15,6 +15,22 @@ $text-color: #181818;
         padding: 10px 0px;
         box-sizing: border-box;
 
+        .btn {
+            padding: 6px 16px;
+            box-sizing: border-box;
+            margin: 0px 6px;
+            border-radius: 24px;
+            cursor: pointer;
+            background-color: #000000;
+            color: #FFFFFF;
+            text-transform: uppercase;
+
+            &:active {
+                background-color: rgba(0, 0, 0, 0.3);
+            }
+
+        }
+
         .left {
             cursor: pointer;
         }

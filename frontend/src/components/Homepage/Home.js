@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from "./Home.module.scss";
 import cn from "classnames/bind";
 
 const cx = cn.bind(styles);
 
 const Home = () => {
+
     return (
         <div className={cx("container")}>
             <div className={cx("homepage")}>
@@ -20,7 +21,7 @@ const Home = () => {
                     <div className={cx("button")}>START</div>
                     <div className={cx("button1")}>CREATE POST</div>
                 </div>
-                <div>lorem is perisflksdjfksdjfksd</div>
+                {/* <div>lorem is perisflksdjfksdjfksd</div> */}
             </div>
         </div>
     )
