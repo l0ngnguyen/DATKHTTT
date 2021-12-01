@@ -16,28 +16,43 @@ import { UserOutlined } from '@ant-design/icons';
 import { GoogleLogin } from 'react-google-login';
 import { Link, useHistory } from "react-router-dom";
 import axios from 'axios';
+import { useSelector, useDispatch } from 'react-redux';
+import { changeUserId } from '../../features/user/userSlice';
 
 const cx = cn.bind(styles);
 
 const SignUpModal = () => {
     const history = useHistory();
+    const dispatch = useDispatch();
+    const email = useSelector(state => state.user.email);
+    const accessToken = window.localStorage.getItem("accessTokenSO");
 
     const onFinish = async (value) => {
         const data = {
             'userName': value.username,
-            'email': value.email,
             'password': value.password,
+            'email': email,
+            'accessToken': accessToken,
+            "avatarLink": "",
+            "gender": true,
+            "facebookLink": "",
+            "githubLink": "",
+            "location": "",
+            "description": "",
+            "role": 1,
+            "googleID": "",
         }
 
         try {
-            const res = await axios.post(`http://localhost:3001/auth/sign-up/send-otp`, {
-                'email': data.email,
-            });
+            const res = await axios.post(`http://localhost:3001/auth/sign-up`, data);
             if (res.status === 200) {
-
+                window.localStorage.setItem("accessTokenSO", res.data.accessToken);
+                console.log(res);
+                dispatch(changeUserId(res.data.userId));
+                history.push("/");
             }
         } catch (err) {
-            console.log(err);
+            console.log(err.response);
         }
     };
 
@@ -47,6 +62,7 @@ const SignUpModal = () => {
 
     return (
         <>
+            <HeaderLogin isLogin={false} />
             <div className={cx("container")}>
                 <div className={cx("login")}>
                     <div className={cx("top")}>
@@ -57,7 +73,7 @@ const SignUpModal = () => {
                         </div>
                     </div>
                     <div className={cx("form")}>
-                        <div><b>You can skip this step and sign up now!</b></div>
+                        <div>Complete the fields below to continue logging in with email "{email}"</div>
                         <Form
                             name="basic"
                             initialValues={{ remember: true, username: "", password: "" }}
@@ -71,16 +87,6 @@ const SignUpModal = () => {
                                 rules={[{ required: true, message: 'Please input your username!' }]}
                             >
                                 <Input placeholder="Username" prefix={<UserOutlined />} />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="email"
-                                rules={[
-                                    { type: 'email' },
-                                    { required: true, message: 'Please input your username!' }
-                                ]}
-                            >
-                                <Input placeholder="Email" />
                             </Form.Item>
 
                             <Form.Item

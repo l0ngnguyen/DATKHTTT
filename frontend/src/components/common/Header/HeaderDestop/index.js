@@ -4,19 +4,36 @@ import cn from "classnames/bind";
 import logoText from "../../../../images/logo-text.png";
 import searchIcon from "../../../../images/icons/search.png";
 import avatar from "../../../../images/icons/user.png";
+import { useSelector, useDispatch } from 'react-redux';
+import axios from "axios";
 
 import {
     Link,
 } from "react-router-dom";
+import { changeUserId } from '../../../../features/user/userSlice';
 
 const cx = cn.bind(styles);
 
 const HeaderDestop = () => {
-    const [logged, setLogged] = useState();
+    const dispatch = useDispatch();
+    const userId = useSelector(state => state.user.userId);
+    const userInfo = useSelector(state => state.user.info);
 
     useEffect(() => {
-        setLogged(window.localStorage.getItem("accessTokenSO"));
+        getUserData();
     }, []);
+
+    const getUserData = async () => {
+        try {
+            const res = await axios.get(`http://localhost:3001/user/id/${userId}`);
+            if (res.status === 200) {
+                console.log(res);
+                dispatch(changeUserId(res.data));
+            }
+        } catch (err) {
+            console.log(err.response);
+        }
+    }
 
     return (
         <div className={cx("header")}>
@@ -33,7 +50,12 @@ const HeaderDestop = () => {
                     <Link to="/" className={cx("item")}>Post</Link>
                     <Link to="/" className={cx("item")}>Tags</Link>
                     <Link to="/" className={cx("item")}>User</Link>
-                    {logged ? (<img src={avatar} alt="avatar" width={24} />) : (
+                    {userId ? (
+                        <div>
+                            <img src={avatar} alt="avatar" width={24} />
+
+                        </div>
+                    ) : (
                         <span>
                             <Link to="/sign-in" className={cx("button", "item")}>Sign in</Link>
                             <Link to="/sign-up" className={cx("button1", "item")}>Sign up</Link>

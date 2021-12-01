@@ -16,7 +16,9 @@ import { UserOutlined } from '@ant-design/icons';
 import { GoogleLogin } from 'react-google-login';
 import { Link, useHistory } from "react-router-dom";
 import axios from 'axios';
-import SignUpModal from './SignUpModal';
+import SignUpModal from './SignUpWithGG';
+import { useSelector, useDispatch } from 'react-redux';
+import { changeUserId, changeEmail } from '../../features/user/userSlice';
 
 const cx = cn.bind(styles);
 const { Search } = Input;
@@ -24,6 +26,7 @@ const URL = "localhost:3001";
 
 const Register = () => {
     const history = useHistory();
+    const dispatch = useDispatch();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [userData, setUserData] = useState();
     const [otpToken, setOtpToken] = useState();
@@ -32,39 +35,33 @@ const Register = () => {
     const [accessToken, setAccessToken] = useState();
     const [signUp, setSignUp] = useState(false);
 
-    // useEffect(() => {
-    //     testAPI();
-    // }, []);
-
-    // const testAPI = async () => {
-    //     try {
-    //         const res = await axios.get('http://localhost:3001/user/id/1');
-    //         console.log(res);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
-
     const responseGoogle = async (response) => {
         console.log(response);
-        // const data = {
-        //     "idToken": response.tokenId,
-        // }
+        const data = {
+            "idToken": response.tokenId,
+        }
 
-        // try {
-        //     const res = await axios.post(`${URL}/api/Account/gg-authenticate`, data);
-        //     if (res.status === 200) {
-        //         window.localStorage.setItem("token-lingo", res.data.token);
-        //         message.succeRegister success');
-        //         history.push("/");
-        //     }
-        // } catch (err) {
-        //     console.log(err.response);
-        // }
+        try {
+            const res = await axios.post(`http://localhost:3001/auth/sign-up-with-google`, data);
+            if (res.status === 200) {
+                console.log(res);
+                window.localStorage.setItem("accessTokenSO", res.data.accessToken);
+                if (res.data.exist) {
+                    message.success(res.data.message);
+                    dispatch(changeUserId(res.data.userId));
+                    history.push("/");
+                } else {
+                    message.error(res.data.message);
+                    dispatch(changeEmail(res.data.email));
+                    history.push("/sign-up-with-google");
+                }
+            }
+        } catch (err) {
+            console.log(err.response);
+        }
     }
 
     const onFinish = async (value) => {
-        setIsModalVisible(true);
         const data = {
             'userName': value.username,
             'email': value.email,
@@ -77,10 +74,12 @@ const Register = () => {
                 'email': data.email,
             });
             if (res.status === 200) {
+                setIsModalVisible(true);
                 setOtpToken(res.data.otpToken);
             }
         } catch (err) {
-            console.log(err.message);
+            console.log(err.response);
+            message.error(err.response.data.message);
         }
     };
 
@@ -115,7 +114,7 @@ const Register = () => {
                     "gender": true,
                     "facebookLink": "",
                     "githubLink": "",
-                    "location": "Ha Noi",
+                    "location": "",
                     "description": "",
                     "role": 1,
                     "googleID": "" 
@@ -126,6 +125,7 @@ const Register = () => {
                     const signup = await axios.post('http://localhost:3001/auth/sign-up', data);
                     if (signup.status === 200) {
                         window.localStorage.setItem("accessTokenSO", signup.data.accessToken);
+                        dispatch(changeUserId(signup.data.userId));
                         history.push("/");
                     }
                 } catch (err) {
@@ -133,7 +133,7 @@ const Register = () => {
                 }
             }
         } catch (err) {
-            console.log(err);
+            console.log(err.response);
             message.error("Invalid!");
             setLoadingCheckOtp(false);
         }

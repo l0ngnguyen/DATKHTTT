@@ -8,11 +8,14 @@ import { UserOutlined } from '@ant-design/icons';
 import { GoogleLogin } from 'react-google-login';
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from 'react-redux';
+import { changeEmail, changeUserId } from '../../features/user/userSlice';
 
 const cx = cn.bind(styles);
 
 const Login = () => {
     const history = useHistory();
+    const dispatch = useDispatch();
     const [accessToken, setAccessToken] = useState();
 
     const responseGoogle = async (response) => {
@@ -25,9 +28,16 @@ const Login = () => {
             const res = await axios.post(`http://localhost:3001/auth/login-with-google`, data);
             if (res.status === 200) {
                 console.log(res);
-                // window.localStorage.setItem("token-lingo", res.data.token);
-                message.success(res.data.message);
-                // history.push("/");
+                window.localStorage.setItem("accessTokenSO", res.data.accessToken);
+                if (res.data.exist) {
+                    message.success(res.data.message);
+                    dispatch(changeUserId(res.data.userId));
+                    history.push("/");
+                } else {
+                    message.error(res.data.message);
+                    dispatch(changeEmail(res.data.email));
+                    history.push("/sign-up-with-google");
+                }
             }
         } catch (err) {
             console.log(err.response);
@@ -45,11 +55,13 @@ const Login = () => {
             const res = await axios.post(`http://localhost:3001/auth/login`, data);
             if (res.status === 200) {
                 window.localStorage.setItem("accessTokenSO", res.data.accessToken);
+                dispatch(changeUserId(res.data.userId));
                 history.push("/");
                 console.log(res);
             }
         } catch (err) {
-            console.log(err.message);
+            console.log(err.response);
+            message.error(err.response.data.message);
         }
     };
 
