@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './index.module.scss';
 import cn from "classnames/bind";
 import HeaderLogin from '../common/Header/HeaderDestop/HeaderLogin';
@@ -7,33 +7,50 @@ import { Form, Input, Checkbox, Button, Divider, message } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { GoogleLogin } from 'react-google-login';
 import { Link, useHistory } from "react-router-dom";
+import axios from "axios";
 
 const cx = cn.bind(styles);
 
 const Login = () => {
-    // const history = useHistory();
+    const history = useHistory();
+    const [accessToken, setAccessToken] = useState();
 
     const responseGoogle = async (response) => {
         console.log(response);
-        // const data = {
-        //     "idToken": response.tokenId,
-        // }
+        const data = {
+            "idToken": response.tokenId,
+        }
 
-        // try {
-        //     const res = await axios.post(`${URL}/api/Account/gg-authenticate`, data);
-        //     if (res.status === 200) {
-        //         window.localStorage.setItem("token-lingo", res.data.token);
-        //         message.success('Login success');
-        //         history.push("/");
-        //     }
-        // } catch (err) {
-        //     console.log(err.response);
-        // }
+        try {
+            const res = await axios.post(`http://localhost:3001/auth/login-with-google`, data);
+            if (res.status === 200) {
+                console.log(res);
+                // window.localStorage.setItem("token-lingo", res.data.token);
+                message.success(res.data.message);
+                // history.push("/");
+            }
+        } catch (err) {
+            console.log(err.response);
+        }
     }
 
 
-    const onFinish = (value) => {
+    const onFinish = async (value) => {
         console.log('Success:', value);
+        let data = {
+            "username": value.username,
+            "password": value.password,
+        }
+        try {
+            const res = await axios.post(`http://localhost:3001/auth/login`, data);
+            if (res.status === 200) {
+                window.localStorage.setItem("accessTokenSO", res.data.accessToken);
+                history.push("/");
+                console.log(res);
+            }
+        } catch (err) {
+            console.log(err.message);
+        }
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -65,7 +82,7 @@ const Login = () => {
                                 name="username"
                                 rules={[{ required: true, message: 'Please input your username!' }]}
                             >
-                                <Input placeholder="Username" prefix={<UserOutlined />} />
+                                <Input placeholder="Username or Email" prefix={<UserOutlined />} />
                             </Form.Item>
 
                             <Form.Item
@@ -81,9 +98,9 @@ const Login = () => {
                             </Form.Item> */}
 
                             <Form.Item >
-                                <div htmlType="submit" className={cx("button")}>
+                                <Button htmlType="submit" className={cx("button")}>
                                     SIGN IN
-                                </div>
+                                </Button>
                             </Form.Item>
                         </Form>
                         <Divider>or</Divider>
