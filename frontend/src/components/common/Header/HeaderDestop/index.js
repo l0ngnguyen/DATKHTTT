@@ -18,9 +18,12 @@ const HeaderDestop = () => {
     const dispatch = useDispatch();
     const userId = useSelector(state => state.user.userId);
     const userInfo = useSelector(state => state.user.info);
+    const [data, setData] = useState(userInfo);
+    const [logged, setLogged] = useState(false);
 
     useEffect(() => {
         getUserData();
+        setLogged(window.localStorage.getItem("accessTokenSO"));
     }, []);
 
     const getUserData = async () => {
@@ -28,7 +31,8 @@ const HeaderDestop = () => {
             const res = await axios.get(`http://localhost:3001/user/id/${userId}`);
             if (res.status === 200) {
                 console.log(res);
-                dispatch(changeUserId(res.data));
+                dispatch(changeUserId(res.data.result));
+                setData(res.data.result);
             }
         } catch (err) {
             console.log(err.response);
@@ -50,10 +54,10 @@ const HeaderDestop = () => {
                     <Link to="/" className={cx("item")}>Post</Link>
                     <Link to="/" className={cx("item")}>Tags</Link>
                     <Link to="/" className={cx("item")}>User</Link>
-                    {userId ? (
-                        <div>
+                    {logged ? (
+                        <div style={{ cursor: 'pointer' }}>
                             <img src={avatar} alt="avatar" width={24} />
-
+                            <span style={{ color: "#007CF0", paddingLeft: '8px' }}>{data && data.userName}</span>
                         </div>
                     ) : (
                         <span>
