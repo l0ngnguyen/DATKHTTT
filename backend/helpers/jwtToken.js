@@ -6,7 +6,7 @@ exports.generateToken = function (user, secretSignature, tokenLife) {
     const userData = {
       Id: user.Id,
       userName: user.username,
-      role: user.acctype,
+      role: user.role,
       email:user.email,
       googleId: user.googleId
     }
