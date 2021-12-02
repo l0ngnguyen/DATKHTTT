@@ -67,7 +67,7 @@ const Login = () => {
         }
 
         try {
-            const res = await axios.post(`http://localhost:3001/auth/login`, data);
+            const res = await axios.post(`http://localhost:3001/auth/login`, data , {withCredentials: true});
             if (res.status === 200) {
                 console.log(res.data);
                 window.localStorage.setItem("accessTokenSO", res.data.accessToken);

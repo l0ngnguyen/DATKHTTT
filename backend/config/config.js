@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config() 
 
 exports.port = process.env.PORT || 3001
 exports.accessTokenLife = process.env.ACCESS_TOKEN_LIFE || "1h"
