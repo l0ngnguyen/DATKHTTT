@@ -47,6 +47,7 @@ const Register = () => {
                 console.log(res);
                 window.localStorage.setItem("accessTokenSO", res.data.accessToken);
                 if (res.data.exist) {
+                    setCookie("refreshToken", res.data.accessToken, 5);
                     message.success(res.data.message);
                     dispatch(changeUserId(res.data.userId));
                     history.push("/");
@@ -59,6 +60,16 @@ const Register = () => {
         } catch (err) {
             console.log(err.response);
         }
+    }
+
+    function setCookie(cName, cValue, expHours) {
+        let date = new Date();
+        date.setTime(date.getTime() + (expHours * 60 * 60 * 1000));
+        const expires = "Expires=" + date.toUTCString();
+        document.cookie = cName + "=" + cValue;
+        document.cookie = "path=/";
+        document.cookie = "HttpOnly";
+        document.cookie = expires;
     }
 
     const onFinish = async (value) => {
@@ -78,8 +89,9 @@ const Register = () => {
                 setOtpToken(res.data.otpToken);
             }
         } catch (err) {
+            console.log(err);
             console.log(err.response);
-            message.error(err.response.data.message);
+            message.error(err.response ? err.response?.data.message : "Error");
         }
     };
 
@@ -125,6 +137,7 @@ const Register = () => {
                     const signup = await axios.post('http://localhost:3001/auth/sign-up', data);
                     if (signup.status === 200) {
                         window.localStorage.setItem("accessTokenSO", signup.data.accessToken);
+                        setCookie("refreshToken", signup.data.accessToken, 5);
                         dispatch(changeUserId(signup.data.userId));
                         history.push("/");
                     }

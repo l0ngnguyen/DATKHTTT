@@ -27,6 +27,17 @@ const SignUpModal = () => {
     const email = useSelector(state => state.user.email);
     const accessToken = window.localStorage.getItem("accessTokenSO");
 
+    function setCookie(cName, cValue, expHours) {
+        let date = new Date();
+        date.setTime(date.getTime() + (expHours * 60 * 60 * 1000));
+        const expires = "Expires=" + date.toUTCString();
+        document.cookie = cName + "=" + cValue;
+        document.cookie = "path=/";
+        document.cookie = "HttpOnly";
+        document.cookie = expires;
+    }
+
+
     const onFinish = async (value) => {
         const data = {
             'userName': value.username,
@@ -47,12 +58,14 @@ const SignUpModal = () => {
             const res = await axios.post(`http://localhost:3001/auth/sign-up`, data);
             if (res.status === 200) {
                 window.localStorage.setItem("accessTokenSO", res.data.accessToken);
-                console.log(res);
+                setCookie("refreshToken", res.data.accessToken, 5);
                 dispatch(changeUserId(res.data.userId));
                 history.push("/");
             }
         } catch (err) {
+            console.log(err);
             console.log(err.response);
+            message.error("Username already exists!")
         }
     };
 
