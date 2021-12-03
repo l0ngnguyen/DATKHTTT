@@ -15,12 +15,10 @@ userRouters.post('/upload-avatar/', imageUploadMiddlewares, userController.uploa
 
 userRouters.use(authMiddleware.isAuth)
 userRouters.post('/link-with-google-account', userController.linkWithGoogleAccount)
-//mới làm hôm 30/11 chưa commit và viết doc API
+//mới chưa viết doc API
 userRouters.post('/edit-profile', userController.editProfile)
 userRouters.post('/edit-user/edit-email/sent-otp', userController.sendOtpEditEmail)
 userRouters.post('/edit-user/edit-email/check-otp', userController.checkOtpEditEmail)
 userRouters.post('/edit-user/change-password', userController.changePassword)
-userRouters.post('/', userController.createUser)
-
 
 module.exports = userRouters
