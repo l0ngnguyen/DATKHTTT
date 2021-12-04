@@ -42,9 +42,13 @@ const HeaderDestop = () => {
 
     const handleOk = async () => {
         try {
+            axios.defaults.withCredentials = true;
             const res = await axios.post(`http://localhost:3001/auth/logout`, {});
             if (res.status === 200) {
                 console.log(res);
+                window.localStorage.setItem("accessTokenSO", null);
+                dispatch(changeUserId(null));
+                dispatch(changeUserInfo(null));
                 message.success("Sign out success!")
             }
         } catch (err) {
