@@ -22,11 +22,12 @@ const HeaderDestop = () => {
     const [data, setData] = useState(userInfo);
     const [logged, setLogged] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {
         getUserData();
         setLogged(window.localStorage.getItem("accessTokenSO"));
-    }, []);
+    }, [refresh]);
 
     const getUserData = async () => {
         try {
@@ -42,14 +43,15 @@ const HeaderDestop = () => {
 
     const handleOk = async () => {
         try {
-            axios.defaults.withCredentials = true;
-            const res = await axios.post(`http://localhost:3001/auth/logout`, {});
+            axios.defaults.withCredentials = true
+            const res = await axios.post(`http://localhost:3001/auth/logout`, {withCredentials: true});
             if (res.status === 200) {
                 console.log(res);
-                window.localStorage.setItem("accessTokenSO", null);
-                dispatch(changeUserId(null));
-                dispatch(changeUserInfo(null));
-                message.success("Sign out success!")
+                window.localStorage.setItem("accessTokenSO", "");
+                dispatch(changeUserId());
+                dispatch(changeUserInfo());
+                setRefresh(true);
+                message.success("Sign out success!");
             }
         } catch (err) {
             console.log(err.response);

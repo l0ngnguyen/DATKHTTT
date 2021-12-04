@@ -7,6 +7,7 @@ const config = require('../config/config')
 exports.getUserByUserName = (username) => {
     return knex('User').where('userName', username).first()
 }
+
 exports.getUserByEmail = (email) => {
     return knex('User').where('email', email).first()
 }

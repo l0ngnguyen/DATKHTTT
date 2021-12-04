@@ -85,6 +85,7 @@ exports.refreshToken = async (req, res) => {
 };
 exports.logOut = function (req, res) {
     var refreshToken = req.cookies.refreshToken;
+    console.log(refreshToken)
 
     if (refreshToken) {
         delete tokenList[refreshToken];
@@ -494,8 +495,6 @@ exports.signUp = async (req, res) => {
                 accessToken: accessToken,
                 userId: user.Id
             })
-
-
         }
     } catch (error) {
         return res.status(500).json({

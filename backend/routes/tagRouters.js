@@ -2,9 +2,6 @@ const tagRouters = require('express').Router()
 const tagController = require('../controllers/tagController')
 const authMiddleware = require('../middlewares/authentication')
 
-
-//chưa viết api doc
-
 tagRouters.get('/id/:id', tagController.getTag)
 tagRouters.get('/list', tagController.getTagList)
 tagRouters.get('/search', tagController.searchTag)
