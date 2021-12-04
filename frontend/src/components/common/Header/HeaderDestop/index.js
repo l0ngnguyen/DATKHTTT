@@ -42,7 +42,8 @@ const HeaderDestop = () => {
 
     const handleOk = async () => {
         try {
-            const res = await axios.post(`http://localhost:3001/auth/logout`, {});
+            axios.defaults.withCredentials = true
+            const res = await axios.post(`http://localhost:3001/auth/logout`, {withCredentials: true});
             if (res.status === 200) {
                 console.log(res);
                 message.success("Sign out success!")
