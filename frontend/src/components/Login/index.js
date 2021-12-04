@@ -54,9 +54,6 @@ const Login = () => {
         date.setTime(date.getTime() + (expHours * 60 * 60 * 1000));
         const expires = "Expires=" + date.toUTCString();
         document.cookie = cName + "=" + cValue;
-        document.cookie = "path=/";
-        document.cookie = "HttpOnly";
-        document.cookie = expires;
     }
 
     const onFinish = async (value) => {
