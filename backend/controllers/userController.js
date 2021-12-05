@@ -134,10 +134,11 @@ exports.uploadImage = async function (req, res) {
 
 exports.getAvatar = async function (req, res) {
     try {
-        let avatarPath = await User.getAvatar(req.params.userId)
+        let avatarPath = await User.getAvatar(req.params.id)
+        
 
-        if (avatarPath.avatarLink == undefined) {
-            avatarPath.avatarLink = './public/images/default_avatar.jpg'
+        if (avatarPath == undefined) {
+            avatarPath = {avatarLink: './public/images/default_avatar.jpg'}
         }
 
         avatarPath = path.join(__dirname, '../' + avatarPath.avatarLink)

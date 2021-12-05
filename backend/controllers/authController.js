@@ -494,6 +494,7 @@ exports.signUp = async (req, res) => {
             let user = req.body
             user.accessToken = undefined
             user.password = await bcrypt.hash(user.password, config.saltRounds)
+            user.avatarLink = user.avatarLink || "./public/images/default_avatar.jpg"
 
             user.Id = await User.createUser({ ...user, googleId: data.googleId })
             user = await User.getUser(user.Id);
