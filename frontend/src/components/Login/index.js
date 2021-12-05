@@ -57,7 +57,6 @@ const Login = () => {
     }
 
     const onFinish = async (value) => {
-        console.log('Success:', value);
         let data = {
             "username": value.username,
             "password": value.password,
@@ -66,13 +65,10 @@ const Login = () => {
         try {
             const res = await axios.post(`http://localhost:3001/auth/login`, data , {withCredentials: true});
             if (res.status === 200) {
-                console.log(res.data);
                 window.localStorage.setItem("accessTokenSO", res.data.accessToken);
                 setCookie("refreshToken", res.data.accessToken, 5);
-                console.log("cookie", document.cookie)
                 dispatch(changeUserId(res.data.userId));
                 history.push("/");
-                console.log(res);
             }
         } catch (err) {
             console.log(err);
@@ -94,7 +90,6 @@ const Login = () => {
     };
 
     const sendEmail = async (value) => {
-        console.log(value);
         if (!value) {
             message.error("Please enter email");
         } else {

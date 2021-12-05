@@ -11,12 +11,14 @@ import { Menu, Dropdown, Modal, message } from 'antd';
 import {
     Link,
 } from "react-router-dom";
+import { useHistory } from 'react-router';
 import { changeUserId, changeUserInfo } from '../../../../features/user/userSlice';
 
 const cx = cn.bind(styles);
 
 const HeaderDestop = () => {
     const dispatch = useDispatch();
+    const history = useHistory();
     const userId = useSelector((state) => state.user.userId);
     const userInfo = useSelector(state => state.user.info);
     const [data, setData] = useState(userInfo);
@@ -44,7 +46,7 @@ const HeaderDestop = () => {
     const handleOk = async () => {
         try {
             axios.defaults.withCredentials = true
-            const res = await axios.post(`http://localhost:3001/auth/logout`, {withCredentials: true});
+            const res = await axios.post(`http://localhost:3001/auth/logout`, { withCredentials: true });
             if (res.status === 200) {
                 console.log(res);
                 window.localStorage.setItem("accessTokenSO", "");
@@ -52,6 +54,7 @@ const HeaderDestop = () => {
                 dispatch(changeUserInfo());
                 setRefresh(true);
                 message.success("Sign out success!");
+                history.push("/");
             }
         } catch (err) {
             console.log(err.response);
@@ -65,7 +68,10 @@ const HeaderDestop = () => {
     };
 
     const menuLogout = (
-        <Menu>
+        <Menu className={cx("menu-dropdown")}>
+            <Menu.Item onClick={() => history.push('/profile')}>
+                <span>My profile</span>
+            </Menu.Item>
             <Menu.Item onClick={() => setIsModalVisible(true)}>
                 <span>Sign out</span>
             </Menu.Item>
