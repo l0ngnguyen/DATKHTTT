@@ -8,7 +8,8 @@ import {
     Button,
     Form, Input,
     message,
-    Upload
+    Upload,
+    Tooltip
 } from 'antd';
 import {
     TeamOutlined,
@@ -17,6 +18,7 @@ import {
     PlusCircleOutlined,
     PlusOutlined,
     LoadingOutlined,
+    UploadOutlined,
 } from '@ant-design/icons';
 import MyProfile from './MyProfile/MyProfile';
 import MyPost from './MyPost';
@@ -65,6 +67,7 @@ const Profile = () => {
     const userInfo = useSelector(state => state.user.info);
     const [uploading, setUploading] = useState();
     const [fileList, setFileList] = useState([]);
+    const [visibleModalUploadAvatar, setVisibleModalUploadAvatar] = useState();
 
     const handleOk = () => {
         setIsModalVisible(false);
@@ -142,84 +145,55 @@ const Profile = () => {
         console.log('Failed:', errorInfo);
     };
 
+    const handleUploadAvatar = async (e) => {
+        let url = "http://localhost:3001/upload-avatar";
+        let file = e.target.files[0];
+        console.log("avatar", file);
+        let formData = new FormData();
+        formData.append("avatar", file);
+        axios.post(url, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }).then((response) => {
+            fnSuccess(response);
+        }).catch((error) => {
+            fnFail(error);
+        });
+    };
+
+    const fnSuccess = (response) => {
+        console.log("nb", response)
+    };
+
+    const fnFail = (error) => {
+        console.log("jh", error)
+    };
+
     return (
         <Layout>
             <div className={cx("container")}>
                 <div className={cx("top")}>
                     <div className={cx("left")}>
-                        <Avatar
-                            style={{
-                                backgroundColor: '#52C41A',
-                                width: '120px',
-                                height: '120px',
-                                textAlign: 'center',
-                            }}
-                        />
-                        {/* <Upload
-                            style={{ marginTop: '10px' }}
-                            beforeUpload={(file) => {
-                                if (!file.type.includes('image/')) {
-                                    message.error(`${file.name} is not a image file`);
-                                }
-                                return file.type.includes('image/');
-                            }}
-                            onChange={(info) => {
-                                if (info.file.status === 'uploading') {
-                                    setUploading(true);
-                                } else {
-                                    setUploading(false);
-                                }
-
-                                if (info.file.status === 'done') {
-                                    console.log(" if done", info.fileList);
-                                    setFileList([...fileList, info.file]);
-                                } else if (info.file.status === 'error') {
-                                    console.log(" if error", info.file.error);
-                                    message.error(
-                                        info.file.error.status
-                                            ? info.file.error.status
-                                            : 'An error occurred',
-                                    );
-                                }
-                            }}
-                            accept="image/*"
-                            multiple={true}
-                            showUploadList={false}
-                            customRequest={async ({ onSuccess, onError, file }) => {
-                                const form = new FormData();
-                                form.append('avatar', file);
-                                console.log("form", form);
-                                try {
-                                    const res = await axios.post(
-                                        "http://localhost:3001/upload-avatar/",
-                                        form,
-                                    );
-                                    if (res.status === 200) {
-                                        // let url = "http://" + res.data.data[0].replace(/\\/g, "/")
-                                        // file.url = url;
-                                        console.log("200", res);
-                                        onSuccess(null, file);
-                                    } else {
-                                        onError(res);
-                                    }
-                                } catch (error) {
-                                    onError(error.response);
-                                }
-                            }}
+                        <div
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => setVisibleModalUploadAvatar(true)}
                         >
-                            <div className={cx("upload")}>
-                                {uploading ? (
-                                    loadingIcon
+                            <Tooltip title="Click to upload new avatar">
+                                {userInfo.avatar ? (
+                                    <img src={userInfo.avatar} alt="avatar" />
                                 ) : (
-                                    <>
-                                        <PlusOutlined />
-                                        <div style={{ marginTop: 8 }}>
-                                            Upload
-                                        </div>
-                                    </>
+                                    <Avatar
+                                        style={{
+                                            backgroundColor: '#52C41A',
+                                            width: '120px',
+                                            height: '120px',
+                                            textAlign: 'center',
+                                        }}
+                                    />
                                 )}
-                            </div>
-                        </Upload> */}
+                            </Tooltip>
+                        </div>
                         <div className={cx("info")}>
                             <div className={cx("name")}>{userInfo.userName}</div>
                             <div className={cx("member")}>
@@ -378,6 +352,30 @@ const Profile = () => {
                         <Button onClick={() => setIsPasswordModal(false)}>Cancel</Button>
                     </Form.Item>
                 </Form>
+            </Modal>
+            <Modal
+                title="Upload Avatar"
+                visible={visibleModalUploadAvatar}
+                footer={null}
+                onCancel={() => setVisibleModalUploadAvatar(false)}
+            >
+                {/* <Form
+                    onFinishFailed={onFinishFailedUploadAvatar}
+                    onFinish={onFinishUploadAvatar}
+                >
+                    <Form.Item
+                        name="avatar"
+                        label="Choose image"
+                    >
+                        <Input type="file" accept="image/*" id="file"/>
+                    </Form.Item>
+                    <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
+                        <Button type="primary" htmlType="submit">
+                            Submit
+                        </Button>
+                    </Form.Item>
+                </Form> */}
+                <input type="file" onChange={handleUploadAvatar} accept="image/*" />
             </Modal>
         </Layout >
     )
