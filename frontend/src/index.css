@@ -12,3 +12,9 @@ code {
 * {
   box-sizing: border-box !important;
 }
+
+.ant-dropdown-menu-item, .ant-dropdown-menu-submenu-title {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  padding: 12px 30px !important;
+}

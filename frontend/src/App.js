@@ -12,6 +12,7 @@ import {
 import Login from "./components/Login";
 import Register from "./components/Register";
 import SignUpModal from "./components/Register/SignUpWithGG";
+import Profile from "./components/Profile";
 
 function App() {
   return (
@@ -28,6 +29,9 @@ function App() {
         </Route>
         <Route path="/sign-up-with-google">
           <SignUpModal />
+        </Route>
+        <Route path="/profile">
+          <Profile />
         </Route>
       </Switch>
     </Router>
