@@ -80,6 +80,7 @@ const Register = () => {
         try {
             const res = await axios.post(`http://localhost:3001/auth/sign-up/send-otp`, {
                 'email': data.email,
+                'userName': data.userName
             });
             if (res.status === 200) {
                 setIsModalVisible(true);
