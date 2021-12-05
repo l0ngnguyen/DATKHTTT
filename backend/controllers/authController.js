@@ -41,7 +41,7 @@ exports.login = async function (req, res) {
         });
 
     } catch (err) {
-        console.log(err)
+        
         return res.status(500).json({
             success: false,
             err,
@@ -68,7 +68,7 @@ exports.refreshToken = async (req, res) => {
                 accessToken
             });
         } catch (error) {
-            console.log(error)
+            
             delete tokenList[refreshTokenFromClient];
             res.status(403).json({
                 success: false,
@@ -85,7 +85,7 @@ exports.refreshToken = async (req, res) => {
 };
 exports.logOut = function (req, res) {
     var refreshToken = req.cookies.refreshToken;
-    console.log(refreshToken)
+    
 
     if (refreshToken) {
         delete tokenList[refreshToken];
@@ -121,7 +121,7 @@ exports.sendOtpForgetPassword = async (req, res) => {
         } else {
             transporter.verify(async function (error, success) {
                 if (error) {
-                    console.log(error)
+                   
                     return res.status(535).json({
                         success: false,
                         message: error.message || "Some errors occur while sending email"
@@ -160,7 +160,7 @@ exports.sendOtpForgetPassword = async (req, res) => {
             });
         }
     } catch (error) {
-        console.log(error)
+        
         return res.status(500).json({
             success: false,
             message: error.message || "Some errors occur while sending email"
@@ -370,12 +370,28 @@ exports.sendOtpSignUp = async (req, res) => {
     let transporter = nodemailer.createTransport(emailOption);
     try {
         let email = req.body.email;
-        const user = await User.getUserByEmail(email);
-        if (user) {
-            return res.status(400).json({
-                success: false,
-                message: "Email already use, can not use  email to register new account"
-            });
+        let userName = req.body.userName;
+        const userByEmail = await User.getUserByEmail(email);
+        const userByUserName = await User.getUserByUserName(userName)
+        if (userByEmail || userByUserName) {
+            if (userByEmail && userByUserName){
+                return res.status(400).json({
+                    success: false,
+                    message: "User name and email is already use, can not use this to register new account"
+                });
+            } 
+            else if (userByUserName){
+                return res.status(400).json({
+                    success: false,
+                    message: "User name is already use, can not use this to register new account"
+                });
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: "Email is already use, can not use this to register new account"
+                });
+            }
+            
         } else {
             transporter.verify(async function (error, success) {
                 if (error) {
@@ -417,7 +433,7 @@ exports.sendOtpSignUp = async (req, res) => {
             });
         }
     } catch (error) {
-        console.log(error)
+    
         return res.status(500).json({
             success: false,
             message: error.message || "Some errors occur while sending email"

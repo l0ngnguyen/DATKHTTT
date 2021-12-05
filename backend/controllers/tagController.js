@@ -79,7 +79,7 @@ exports.searchTag = async function (req, res) {
 }
 
 
-exports.createTag = async function editTag(req, res) {
+exports.createTag = async function (req, res) {
 
     try {
         let tag = req.body
@@ -109,7 +109,7 @@ exports.createTag = async function editTag(req, res) {
 
 
 
-exports.editTag = async function editTag(req, res) {
+exports.editTag = async function (req, res) {
     try {
         let tag = await Tag.getTag(req.body.tagId)
         //Check exists
@@ -127,7 +127,6 @@ exports.editTag = async function editTag(req, res) {
             })
         }
         let count = await Tag.editTag({
-            userId: req.jwtDecoded.Id, 
             tagName: req.body.tagName,
             tagDetail: req.body.tagDetail
         }, tag.Id);
@@ -153,7 +152,7 @@ exports.editTag = async function editTag(req, res) {
     }
 }
 
-exports.deleteTag = async function editTag(req, res) {
+exports.deleteTag = async function (req, res) {
     try {
         let tag = await Tag.getTag(req.body.tagId)
         //Check exists
