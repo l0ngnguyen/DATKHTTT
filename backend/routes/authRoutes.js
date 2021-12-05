@@ -1,5 +1,7 @@
 const authRouter = require('express').Router()
 const authController = require('../controllers/authController')
+const notFound = require('./404')
+
 
 authRouter.post('/login', authController.login)
 authRouter.post('/logout', authController.logOut)
@@ -16,5 +18,7 @@ authRouter.post('/sign-up/check-otp', authController.checkOtpSignUp)
 authRouter.post('/sign-up', authController.signUp)
 
 authRouter.post('/sign-up-with-google', authController.signUpWithGoogle)
+
+authRouter.use(notFound)
 
 module.exports = authRouter
