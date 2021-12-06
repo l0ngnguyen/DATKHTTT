@@ -4,7 +4,7 @@ exports.up = function (knex) {
     table.string('userName', 256).notNullable();
     table.string('password', 256).notNullable();
     table.string('email', 265).notNullable();
-    table.string('avatarLink', 256).notNullable();
+    table.string('avatarLink', 256).defaultTo("./public/images/default_avatar.jpg");
     table.boolean('gender').notNullable();//true: male; false: female
     table.string('facebookLink', 256); 
     table.string('githubLink', 256); 
