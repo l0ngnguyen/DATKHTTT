@@ -100,11 +100,10 @@ exports.deleteUserVote = async function (req, res) {
         }
         //xoá vote cũ trước ở post này của người dùng
         let delVote  = await PostVote.deleteUserVote(req.jwtDecoded.Id, req.body.postId)
-        let voteResult = await PostVote.getUserVoteOfPost(req.body.postId, req.jwtDecoded.Id)
 
         return res.status(200).json({
             success: true,
-            result: voteResult
+            result: delVote
         })
         
     }
