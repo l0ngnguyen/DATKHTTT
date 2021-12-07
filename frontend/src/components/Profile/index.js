@@ -146,7 +146,7 @@ const Profile = () => {
     };
 
     const handleUploadAvatar = async (e) => {
-        let url = "http://localhost:3001/upload-avatar";
+        let url = "http://localhost:3001/user/upload-avatar";
         let file = e.target.files[0];
         console.log("avatar", file);
         let formData = new FormData();
