@@ -17,7 +17,6 @@ userRouters.get('/get-avatar/id/:id', userController.getAvatar)
 
 userRouters.use(authMiddleware.isAuth)
 userRouters.post('/link-with-google-account', userController.linkWithGoogleAccount)
-
 userRouters.post('/edit-profile', userController.editProfile)
 userRouters.post('/edit-user/edit-email/sent-otp', userController.sendOtpEditEmail)
 userRouters.post('/edit-user/edit-email/check-otp', userController.checkOtpEditEmail)

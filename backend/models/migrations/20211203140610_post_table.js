@@ -5,7 +5,6 @@ exports.up = function(knex) {
         table.integer('userId').notNullable();
         table.string('postName', 1000).notNullable();
         table.text('postDetail', 'longtext').notNullable();
-        table.integer('voteNum').defaultTo(0);
         table.timestamp('date').defaultTo(knex.fn.now());
         table.integer('rightAnswerID');
         table.unique('postName');
