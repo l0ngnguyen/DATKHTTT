@@ -1,0 +1,95 @@
+.tag {
+    margin: 0;
+    padding: 100px 0px;
+    box-sizing: border-box;
+
+    .container {
+        margin: 0 auto;
+        max-width: 1120px;
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .left {
+                display: flex;
+                align-items: baseline;
+
+                .title {
+                    font-weight: bold;
+                    font-size: 36px;
+                    color: #000000;
+                    margin-right: 12px;
+                }
+
+                .subTitle {
+                    font-weight: bold;
+                    font-size: 18px;
+                    line-height: 21px;
+                    color: #007CF0;
+                }
+            }
+
+            .right {
+                display: flex;
+                align-items: center;
+
+                .search {
+                    width: 200px;
+                    margin-right: 36px;
+                }
+
+                .button {
+                    background: #000000;
+                    border-radius: 25px;
+                    padding: 9px 20px;
+                    color: #FFFFFF;
+                    font-size: 16px;
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .body {
+            margin: 40px 0px;
+
+            .card {
+                height: 220px;
+                cursor: pointer;
+
+                &:hover {
+                    // transform: scale(1.012, 1.012);
+                    transition-duration: 0.35s;
+                    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.12);
+                }
+
+                .label {
+                    background: #1890FF;
+                    border-radius: 4px;
+                    padding: 3px 8px;
+                    color: #FFFFFF;
+                    width: fit-content;
+                }
+
+                .content {
+                    margin: 16px 0px;
+                    text-align: justify;
+                    line-height: 1.4;
+                }
+
+                &-footer {
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 12px;
+                    line-height: 14px;
+                    color: #C4C4C4;
+                }
+            }
+        }
+
+        .pagination {
+            text-align: right;
+        }
+    }
+}

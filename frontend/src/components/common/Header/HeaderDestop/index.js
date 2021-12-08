@@ -91,12 +91,16 @@ const HeaderDestop = () => {
                 <div className={cx("menu")}>
                     <Link to="/" className={cx("item")}>Home</Link>
                     <Link to="/" className={cx("item")}>Post</Link>
-                    <Link to="/" className={cx("item")}>Tags</Link>
+                    <Link to="/tags" className={cx("item")}>Tags</Link>
                     <Link to="/" className={cx("item")}>User</Link>
                     {logged ? (
                         <Dropdown overlay={menuLogout}>
                             <div style={{ cursor: 'pointer' }}>
-                                <img src={avatar} alt="avatar" width={24} />
+                                <img
+                                    src={`http://localhost:3001/${userInfo.avatarLink}`}
+                                    alt="avatar"
+                                    width={24}
+                                />
                                 <span style={{ color: "#007CF0", paddingLeft: '8px' }}>{data && data.userName}</span>
                             </div>
                         </Dropdown>
