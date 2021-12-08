@@ -8,7 +8,6 @@ import {
     Button,
     Form, Input,
     message,
-    Upload,
     Tooltip
 } from 'antd';
 import {
@@ -16,9 +15,7 @@ import {
     EnvironmentOutlined,
     EditOutlined,
     PlusCircleOutlined,
-    PlusOutlined,
     LoadingOutlined,
-    UploadOutlined,
 } from '@ant-design/icons';
 import MyProfile from './MyProfile/MyProfile';
 import MyPost from './MyPost';
@@ -28,7 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import axios from 'axios';
 import { changeUserInfo } from '../../features/user/userSlice';
-import UploadAvatar from './UploadAvatar/UploadAvatar';
+import YourTags from './Tags';
 
 const cx = cn.bind(styles);
 
@@ -56,6 +53,11 @@ const link = [
         title: 'Favorite posts',
         path: 'favorite-post',
         tab: 4,
+    },
+    {
+        title: 'Tags',
+        path: 'tags',
+        tab: 5,
     }
 ]
 
@@ -65,9 +67,10 @@ const Profile = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isPasswordModal, setIsPasswordModal] = useState(false);
     const userInfo = useSelector(state => state.user.info);
+    console.log("userinfo", userInfo);
     const [uploading, setUploading] = useState();
-    const [fileList, setFileList] = useState([]);
     const [visibleModalUploadAvatar, setVisibleModalUploadAvatar] = useState();
+    const [avatar, setAvatar] = useState();
 
     const handleOk = () => {
         setIsModalVisible(false);
@@ -146,7 +149,8 @@ const Profile = () => {
     };
 
     const handleUploadAvatar = async (e) => {
-        let url = "http://localhost:3001/upload-avatar";
+        setUploading(true);
+        let url = "http://localhost:3001/user/upload-avatar";
         let file = e.target.files[0];
         console.log("avatar", file);
         let formData = new FormData();
@@ -163,12 +167,46 @@ const Profile = () => {
     };
 
     const fnSuccess = (response) => {
-        console.log("nb", response)
+        console.log(response);
+        setAvatar(response.data.result);
+        setUploading(false);
     };
 
     const fnFail = (error) => {
-        console.log("jh", error)
+        console.log(error);
+        message.error("Upload image fail!")
     };
+
+    const changeAvatar = async () => {
+        const token = window.localStorage.getItem("accessTokenSO");
+        const bodyParams = {
+            'token': token,
+            'userName': userInfo.userName,
+            'gender': true,
+            'facebookLink': userInfo.facebookLink,
+            'githubLink': userInfo.githubLink,
+            'location': userInfo.location,
+            'description': userInfo.description,
+            'avatarLink': avatar,
+        }
+        try {
+            const res = await axios.post(
+                "http://localhost:3001/user/edit-profile",
+                bodyParams
+            );
+
+            if (res.status === 200) {
+                console.log(res);
+                dispatch(changeUserInfo(res.data.user));
+                message.success("Upload image success!");
+                setVisibleModalUploadAvatar(false);
+            }
+
+        } catch (err) {
+            console.log(err.response);
+            message.error(err.response?.data?.message);
+        }
+    }
 
     return (
         <Layout>
@@ -180,8 +218,14 @@ const Profile = () => {
                             onClick={() => setVisibleModalUploadAvatar(true)}
                         >
                             <Tooltip title="Click to upload new avatar">
-                                {userInfo.avatar ? (
-                                    <img src={userInfo.avatar} alt="avatar" />
+                                {userInfo?.avatarLink ? (
+                                    <img
+                                        src={`http://localhost:3001/${userInfo.avatarLink}`}
+                                        alt="avatar"
+                                        width={120}
+                                        height={120}
+                                        style={{ borderRadius: '50%' }}
+                                    />
                                 ) : (
                                     <Avatar
                                         style={{
@@ -239,8 +283,10 @@ const Profile = () => {
                         <MyPost />
                     ) : tabActive === 3 ? (
                         <MyAnswer />
-                    ) : (
+                    ) : tabActive === 4 ?(
                         <FavoritePost />
+                    ) : (
+                        <YourTags />
                     )}
                 </div>
             </div>
@@ -358,24 +404,15 @@ const Profile = () => {
                 visible={visibleModalUploadAvatar}
                 footer={null}
                 onCancel={() => setVisibleModalUploadAvatar(false)}
+                width={300}
             >
-                {/* <Form
-                    onFinishFailed={onFinishFailedUploadAvatar}
-                    onFinish={onFinishUploadAvatar}
-                >
-                    <Form.Item
-                        name="avatar"
-                        label="Choose image"
-                    >
-                        <Input type="file" accept="image/*" id="file"/>
-                    </Form.Item>
-                    <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
-                        <Button type="primary" htmlType="submit">
-                            Submit
-                        </Button>
-                    </Form.Item>
-                </Form> */}
                 <input type="file" onChange={handleUploadAvatar} accept="image/*" />
+                <br /><br /><br />
+                <div>
+                    <Button type="primary" onClick={changeAvatar}  disabled={uploading}>
+                        Submit
+                    </Button>
+                </div>
             </Modal>
         </Layout >
     )
