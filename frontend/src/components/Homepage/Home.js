@@ -1,10 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from "./Home.module.scss";
 import cn from "classnames/bind";
+import axios from 'axios';
 
 const cx = cn.bind(styles);
 
 const Home = () => {
+
+    useEffect(() => {
+        getUserInfo();
+    }, [])
+
+    const getUserInfo = async () => {
+        try {
+            const res = await axios.get(`http://localhost:3001/user/id/2`);
+            if (res.status === 200) {
+                console.log(res);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     return (
         <div className={cx("container")}>

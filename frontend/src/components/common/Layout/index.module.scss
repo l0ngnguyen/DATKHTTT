@@ -1,12 +1,5 @@
 .layout {
-    min-width: 100vw;
-    min-height: 100vh;
-    // display: flex;
-    // flex-direction: column;
-    // justify-content: space-between;
-
-//     .container {
-//         max-width: 1200px;
-//         margin: 0px auto;
-//     }
+    max-width: 100vw;
+    max-height: 100vh;
+    box-sizing: border-box;
 }

@@ -81,7 +81,7 @@ const HeaderDestop = () => {
     return (
         <div className={cx("header")}>
             <div className={cx("container")}>
-                <div className={cx("left")}>
+                <div className={cx("left")} onClick={() => history.push("/")}>
                     <img alt="logo" src={logoText} height={50} />
                 </div>
                 <div className={cx("middle")}>
