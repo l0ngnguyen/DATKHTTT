@@ -5,11 +5,21 @@ const PostTag = require('../models/PostTag')
 const PostVote = require('../models/PostVote')
 const config = require('../config/config')
 const jwtHelper = require('../helpers/jwtToken')
+const Answer = require('../models/Answer')
+const AnswerVote = require('../models/AnswerVote')
+
 
 
 exports.getVoteNum = async function (req, res) {
     //lấy vote num của vote đó
     try {
+        let post = await Post.getPost(req.query.postId)
+        if (!post) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot find post with id = ${req.query.postId}`
+            })
+        }
         let voteNum = { upVote: 0, downVote: 0 }
         let upVote = await PostVote.getUpVoteNumOfPost(req.query.postId)
         let downVote = await PostVote.getDownVoteNumOfPost(req.query.postId)
@@ -116,9 +126,7 @@ exports.deleteUserVote = async function (req, res) {
     }
 }
 
-//thêm câu trả lời đúng
 
-//xoá câu trả lời đúng
 
 
 exports.getTags = async function (req, res){
@@ -320,7 +328,7 @@ exports.editPost = async function (req, res) {
         }
         let count = await Post.editPost({
             postName: req.body.postName,
-            postDetail: req.body.postDetail
+            postDetail: req.body.postDetail,
         }, post.Id);
         post = await Post.getPost(req.body.postId)
 
@@ -383,12 +391,16 @@ exports.deletePost = async function (req, res) {
                 message: `You are not post creator or admin, can not delete this tag`
             })
         }
+
         //xoas cac tag khoi post (them vao luc lam bang co khoa ngoai de no khong loi)
-        let delPostTag = await PostTag.deleteTagFromPost(req.body.postId)
+        let ansVoteCount = await AnswerVote.deleteUserVoteByPostId(req.body.postId)
+        let answerCount = await Answer.deleteAnswersByPostId(req.body.postId)
 
-        let count = await Post.deletePost(req.body.postId)
+        //xoá post
+        let postVoteCount = await PostVote.deleteUserVoteByPosstId(req.body.postId)
+        let postCount = await Post.deletePost(req.body.postId)
 
-        if (count == 0) {
+        if (postCount == 0) {
             return res.status(404).json({
                 success: false,
                 message: `Cannot delete post with id = ${req.body.postId}`
@@ -397,7 +409,7 @@ exports.deletePost = async function (req, res) {
 
         return res.status(200).json({
             success: true,
-            result: count
+            result: postCount
         })
 
     } catch (error) {
@@ -408,4 +420,104 @@ exports.deletePost = async function (req, res) {
     }
 }
 
+//get right answer of post
+//set right answer of post
+exports.setRightAnswer = async function (req, res) {
+    try {
+        let post = await Post.getPost(req.body.postId)
+        //Check exists
+        if (post === undefined) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot find post with id = ${req.body.postId}`
+            })
+        }
+        let answer = await Answer.getAnswer(req.body.answerId)
+        //Check exists
+        if (answer === undefined) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot find answer with id = ${req.body.answerId}`
+            })
+        }
+        if (answer.postId != req.body.postId){
+            return res.status(400).json({
+                success: false,
+                message: `Cannot set answer of another post for this post`
+            })
+        }
+        //check xem có quyền edit post hay không: là chủ sở hữu hoặc là admin (role bằng 2 là admin)
+        if (post.userId != req.jwtDecoded.Id && req.jwtDecoded.role != 2) {
+            return res.status(403).json({
+                success: false,
+                message: `You are not post creator or admin, can not edit this post`
+            })
+        }
+        let count = await Post.editPost({
+            rightAnswerId: req.body.answerId,
+        }, post.Id);
+        post = await Post.getPost(req.body.postId)
 
+        if (count == 0) {
+            return res.status(404).json({
+                success: false,
+                message: `Cannot edit post with id = ${req.body.postId}`
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            result: post
+        })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error
+        })
+    }
+}
+//delete right answer of post
+exports.delRightAnswer = async function (req, res) {
+    try {
+        let post = await Post.getPost(req.body.postId)
+        //Check exists
+        if (post === undefined) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot find post with id = ${req.body.postId}`
+            })
+        }
+        //check xem có quyền edit post hay không: là chủ sở hữu hoặc là admin (role bằng 2 là admin)
+        if (post.userId != req.jwtDecoded.Id && req.jwtDecoded.role != 2) {
+            return res.status(403).json({
+                success: false,
+                message: `You are not post creator or admin, can not edit this post`
+            })
+        }
+        let count = await Post.editPost({
+            rightAnswerId: null,
+        }, post.Id);
+        post = await Post.getPost(req.body.postId)
+
+        if (count == 0) {
+            return res.status(404).json({
+                success: false,
+                message: `Cannot edit post with id = ${req.body.postId}`
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            result: post
+        })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error
+        })
+    }
+}

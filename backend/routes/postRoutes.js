@@ -17,7 +17,8 @@ postRouter.post('/user/create-vote', postController.creteUserVote)
 postRouter.post('/create-post', postController.createPost)
 postRouter.post('/edit-post', postController.editPost)
 postRouter.post('/delete-post', postController.deletePost)
-
+postRouter.post('/set-right-answer', postController.setRightAnswer)
+postRouter.post('/delete-right-answer', postController.delRightAnswer)
 postRouter.use(notFound)
 
 
