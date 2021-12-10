@@ -97,7 +97,7 @@ const HeaderDestop = () => {
                         <Dropdown overlay={menuLogout}>
                             <div style={{ cursor: 'pointer' }}>
                                 <img
-                                    src={`http://localhost:3001/${userInfo.avatarLink}`}
+                                    src={`http://localhost:3001/${userInfo?.avatarLink}`}
                                     alt="avatar"
                                     width={24}
                                 />

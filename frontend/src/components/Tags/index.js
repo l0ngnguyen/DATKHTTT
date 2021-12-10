@@ -21,19 +21,37 @@ const Tags = () => {
     const [list, setList] = useState();
     const [loading, setLoading] = useState(true);
     const [visible, setVisible] = useState(false);
+    const [tag, setTag] = useState();
+    const [total, setTotal] = useState();
 
     useEffect(() => {
         getListTags();
     }, [page, perPage]);
 
-    const onSearch = value => console.log(value);
+    const onSearch = async (value) => {
+        console.log(value);
+        setLoading(true);
+        try {
+            const res = await axios.get(`${domain}/tag/search?query=${value}`);
+            if (res.status === 200) {
+                console.log(res);
+                setList(res.data.result);
+                setTotal(res.data.result.length);
+                setLoading(false);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     const getListTags = async () => {
         setLoading(true);
         try {
             const res = await axios.get(`${domain}/tag/list?page=${page}&perPage=${perPage}`);
             if (res.status === 200) {
-                setList(res.data.result);
+                console.log(res);
+                setList(res.data.result.data);
+                setTotal(res.data.result.pagination.total);
                 setLoading(false);
             }
         } catch (err) {
@@ -50,29 +68,39 @@ const Tags = () => {
                         <div className={cx("header")}>
                             <div className={cx("left")}>
                                 <div className={cx("title")}>Tags</div>
-                                <div className={cx("subTitle")}>123 tags</div>
+                                <div className={cx("subTitle")}>{total} tags</div>
                             </div>
                             <div className={cx("right")}>
                                 <Search
-                                    placeholder="input search text"
+                                    placeholder="Find by tag name"
                                     allowClear
                                     onSearch={onSearch}
                                     className={cx("search")}
                                     size="large"
                                 />
-                                <div className={cx("button")}>
+                                {/* <div className={cx("button")}>
                                     <PlusCircleOutlined />  Create New Tag
-                                </div>
+                                </div> */}
                             </div>
                         </div>
+                        <div style={{ fontSize: '12px', width: '45%', padding: '10px 0px 0px 10px' }}>A tag is a keyword or label that
+                            categorizes your question with other,
+                            similar questions. Using the right
+                            tags makes it easier for others to find
+                            and answer your question.
+                        </div>
+
 
                         <div className={cx("body")}>
                             <Row gutter={[16, 24]}>
-                                {list.data.map((item, index) => (
+                                {list.length ? list.map((item, index) => (
                                     <Col span={6} key={index}>
                                         <Card
                                             className={cx("card")}
-                                            onClick={() => setVisible(true)}
+                                            onClick={() => {
+                                                setVisible(true);
+                                                setTag(item);
+                                            }}
                                         >
                                             <div className={cx("label")}>#{item.tagName}</div>
                                             <div className={cx("content")}>
@@ -87,7 +115,11 @@ const Tags = () => {
                                             </div>
                                         </Card>
                                     </Col>
-                                ))}
+                                )) : (
+                                    <div>
+                                        No result
+                                    </div>
+                                )}
                             </Row>
                         </div>
 
@@ -95,7 +127,7 @@ const Tags = () => {
                             <Pagination
                                 defaultPageSize={20}
                                 defaultCurrent={1}
-                                total={list.pagination.total}
+                                total={total}
                                 showTotal={total => `Total ${total} items`}
                                 onChange={(page, pageSize) => {
                                     setPage(page);
@@ -103,13 +135,17 @@ const Tags = () => {
                                 }}
                             />
                         </div>
+
+                        {tag && <TagDetail
+                            visible={visible}
+                            hide={() => setVisible(false)}
+                            tagId={tag.Id}
+                            authorId={tag.userId}
+                        />}
+
                     </div>
                 )}
             </div>
-            <TagDetail
-                visible={visible}
-                hide={() => setVisible(false)}
-            />
         </Layout>
     )
 }

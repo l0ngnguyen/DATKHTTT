@@ -63,7 +63,7 @@ const MyProfile = () => {
                     </div>
                     <div className={cx("title")}>Top posts</div>
                     <div className={cx("card")}>
-                        This user hasn’t posted yet
+                        You hasn’t posted yet
                     </div>
                 </Col>
             </Row>
