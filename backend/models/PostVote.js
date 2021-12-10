@@ -27,3 +27,7 @@ exports.addUserVote = (postId, userId, voteType) => {
 exports.deleteUserVote = (userId, postId) => {
     return knex('Post_Vote').where("userId", userId).andWhere("postId", postId).del()
 }
+
+exports.deleteUserVoteByPosstId = (postId) => {
+    return knex('Post_Vote').where("postId", postId).del()
+}
