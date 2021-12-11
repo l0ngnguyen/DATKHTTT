@@ -46,8 +46,9 @@ exports.getTagList = async function (req, res) {
         }
 
         if (tagList.data.length == 0) {
-            return res.status(400).json({
-                success: false,
+            return res.status(200).json({
+                success: true,
+                result: tagList,
                 message: "No tag found"
             })
         }
