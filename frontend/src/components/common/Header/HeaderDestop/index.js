@@ -43,18 +43,18 @@ const HeaderDestop = () => {
         }
     }
 
-    const handleOk = async () => {
+    const handleLogout = async () => {
         try {
             axios.defaults.withCredentials = true
             const res = await axios.post(`http://localhost:3001/auth/logout`, { withCredentials: true });
             if (res.status === 200) {
                 console.log(res);
                 window.localStorage.setItem("accessTokenSO", "");
+                history.push("/");
                 dispatch(changeUserId());
                 dispatch(changeUserInfo());
                 setRefresh(true);
                 message.success("Sign out success!");
-                history.push("/");
             }
         } catch (err) {
             console.log(err.response);
@@ -113,7 +113,7 @@ const HeaderDestop = () => {
             </div >
             <Modal
                 visible={isModalVisible}
-                onOk={handleOk}
+                onOk={handleLogout}
                 onCancel={handleCancel}
                 width={300}
             >

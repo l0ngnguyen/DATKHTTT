@@ -28,7 +28,7 @@ const YourTags = () => {
     const getListUserTag = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${URL}/tag/list?userId=1&page=${page}&perPage=20`);
+            const res = await axios.get(`${URL}/tag/list?userId=${userId}&page=${page}&perPage=20`);
             if (res.status === 200) {
                 setListTag(res.data.result.data);
                 setLoading(false);
