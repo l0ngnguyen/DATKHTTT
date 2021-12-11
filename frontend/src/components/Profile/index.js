@@ -26,6 +26,7 @@ import moment from 'moment';
 import axios from 'axios';
 import { changeUserInfo } from '../../features/user/userSlice';
 import YourTags from './Tags';
+import { useHistory, useLocation } from 'react-router';
 
 const cx = cn.bind(styles);
 
@@ -36,38 +37,50 @@ const { TextArea } = Input;
 const link = [
     {
         title: 'Profile',
-        path: '',
+        path: 'profile',
         tab: 1,
+        component: <MyProfile />,
     },
     {
         title: 'My posts',
         path: 'my-post',
         tab: 2,
+        component: <MyPost />,
     },
     {
         title: 'My answers',
         path: 'my-answer',
         tab: 3,
+        component: <MyAnswer />,
     },
     {
         title: 'Favorite posts',
         path: 'favorite-post',
         tab: 4,
+        component: <FavoritePost />,
     },
     {
         title: 'Tags',
         path: 'tags',
         tab: 5,
+        component: <YourTags />,
     }
-]
+];
+
+function useQuery() {
+    const { search } = useLocation();
+
+    return React.useMemo(() => new URLSearchParams(search), [search]);
+}
 
 const Profile = () => {
     const dispatch = useDispatch();
+    const history = useHistory();
+    const query = useQuery();
     const [tabActive, setTabActive] = useState(1);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isPasswordModal, setIsPasswordModal] = useState(false);
     const userInfo = useSelector(state => state.user.info);
-    console.log("userinfo", userInfo);
     const [uploading, setUploading] = useState();
     const [visibleModalUploadAvatar, setVisibleModalUploadAvatar] = useState();
     const [avatar, setAvatar] = useState();
@@ -266,10 +279,13 @@ const Profile = () => {
                             <div
                                 className={cx(
                                     "tab-navigation-item",
-                                    tabActive === (ind + 1) && "active",
+                                    item.path === query.get("tab") && "active",
                                 )}
                                 key={ind}
-                                onClick={() => setTabActive(item.tab)}
+                                onClick={() => {
+                                    setTabActive(item.tab);
+                                    history.push(`/profile?tab=${item.path}`)
+                                }}
                             >
                                 {item.title}
                             </div>
@@ -277,17 +293,21 @@ const Profile = () => {
                     }
                 </div>
                 <div className={cx("body")}>
-                    {tabActive === 1 ? (
+                    {query.get("tab")
+                        ? link.filter((item, index) => item.path === query.get("tab"))[0].component
+                        : (<MyProfile />)
+                    }
+                    {/* {tabActive === 1 ? (
                         <MyProfile />
                     ) : tabActive === 2 ? (
                         <MyPost />
                     ) : tabActive === 3 ? (
                         <MyAnswer />
-                    ) : tabActive === 4 ?(
+                    ) : tabActive === 4 ? (
                         <FavoritePost />
                     ) : (
                         <YourTags />
-                    )}
+                    )} */}
                 </div>
             </div>
             <Modal
@@ -409,7 +429,7 @@ const Profile = () => {
                 <input type="file" onChange={handleUploadAvatar} accept="image/*" />
                 <br /><br /><br />
                 <div>
-                    <Button type="primary" onClick={changeAvatar}  disabled={uploading}>
+                    <Button type="primary" onClick={changeAvatar} disabled={uploading}>
                         Submit
                     </Button>
                 </div>

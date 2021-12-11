@@ -1,0 +1,28 @@
+.modal {
+    padding: 30px;
+
+    .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        .label {
+            background: #1890FF;
+            border-radius: 4px;
+            padding: 3px 8px;
+            color: #FFFFFF;
+            width: fit-content;
+        }
+
+        .right {
+            text-align: right;
+            font-size: 14px;
+            color: #C4C4C4;
+        }
+    }
+
+    .content {
+        text-align: justify;
+        margin-top: 20px;
+    }
+}

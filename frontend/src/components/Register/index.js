@@ -52,7 +52,7 @@ const Register = () => {
                     dispatch(changeUserId(res.data.userId));
                     history.push("/");
                 } else {
-                    message.error(res.data.message);
+                    message.success(res.data.message);
                     dispatch(changeEmail(res.data.email));
                     history.push("/sign-up-with-google");
                 }
