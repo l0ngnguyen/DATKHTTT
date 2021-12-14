@@ -125,8 +125,8 @@ const Tags = () => {
 
                         <div className={cx("pagination")}>
                             <Pagination
-                                defaultPageSize={20}
-                                defaultCurrent={1}
+                                defaultPageSize={perPage}
+                                defaultCurrent={page}
                                 total={total}
                                 showTotal={total => `Total ${total} items`}
                                 onChange={(page, pageSize) => {

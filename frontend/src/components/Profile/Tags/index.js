@@ -20,10 +20,12 @@ const YourTags = () => {
     const userId = useSelector(state => state.user.userId);
     const [page, setPage] = useState(1);
     const [tag, setTag] = useState();
+    const [reload, setReload] = useState(false);
+    console.log("tag", tag);
 
     useEffect(() => {
         getListUserTag();
-    }, [page]);
+    }, [page, reload]);
 
     const getListUserTag = async () => {
         setLoading(true);
@@ -53,6 +55,8 @@ const YourTags = () => {
             if (res.status === 200) {
                 console.log(res);
                 message.success("Create new tag success!");
+                setIsModalVisible(false);
+                setReload(true);
             }
         } catch (err) {
             console.log(err.response);
@@ -67,7 +71,7 @@ const YourTags = () => {
     const onFinishEditTag = async (values) => {
         const bodyParam = {
             token: token,
-            tagId: tag.tagId,
+            tagId: tag.Id,
             tagName: values.tagName,
             tagDetail: values.tagDetail,
         }
@@ -76,6 +80,8 @@ const YourTags = () => {
             if (res.status === 200) {
                 console.log(res);
                 message.success("Edit tag success!");
+                setVisibleEditModal(false);
+                setReload(!reload);
             }
         } catch (err) {
             console.log(err.response);
@@ -90,13 +96,15 @@ const YourTags = () => {
     const handleDeleteTag = async () => {
         const bodyParam = {
             token: token,
-            tagId: tag.tagId,
+            tagId: tag.Id,
         }
         try {
             const res = await axios.post(`${URL}/tag/delete-tag`, bodyParam);
             if (res.status === 200) {
                 console.log(res);
                 message.success("Deleted!");
+                setVisibleDeleteModal(false);
+                setReload(!reload);
             }
         } catch (err) {
             console.log(err.response);
@@ -179,7 +187,7 @@ const YourTags = () => {
                             name="tagDetail"
                             rules={[{ required: true, message: 'Please input tag description!' }]}
                         >
-                            <Input.TextArea maxLength={300} showCount rows={6} />
+                            <Input.TextArea maxLength={500} showCount rows={6} />
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary" htmlType="submit">Create</Button>
