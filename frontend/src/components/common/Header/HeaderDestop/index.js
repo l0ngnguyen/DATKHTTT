@@ -92,7 +92,7 @@ const HeaderDestop = () => {
                     <Link to="/" className={cx("item")}>Home</Link>
                     <Link to="/" className={cx("item")}>Post</Link>
                     <Link to="/tags" className={cx("item")}>Tags</Link>
-                    <Link to="/" className={cx("item")}>User</Link>
+                    <Link to="/" className={cx("item")}>Author</Link>
                     {logged ? (
                         <Dropdown overlay={menuLogout}>
                             <div style={{ cursor: 'pointer' }}>

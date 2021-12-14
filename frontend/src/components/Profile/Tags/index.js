@@ -127,7 +127,7 @@ const YourTags = () => {
                             <div style={{ flex: 1 }}>
                                 <Tag color="blue" >{item.tagName}</Tag>
                             </div>
-                            <div style={{ flex: 5 }}>{item.tagDetail}</div>
+                            <div style={{ flex: 5 }}>{item.tagDetail.slice(0, 300)} ...</div>
                             <div className={cx("right")} style={{ flex: 1 }}>
                                 <EditOutlined
                                     className={cx("icon")}
