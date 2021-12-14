@@ -5,6 +5,7 @@ const PostTag = require('../models/PostTag')
 const PostVote = require('../models/PostVote')
 const config = require('../config/config')
 const Answer = require('../models/Answer')
+const User = require('../models/User')
 const AnswerVote = require('../models/AnswerVote')
 const jwtHelper = require('../helpers/jwtToken')
 
@@ -156,16 +157,37 @@ exports.getAnswerList = async function (req, res) {
     try {
         let page = parseInt(req.query.page) || config.pageItem
         let perPage = parseInt(req.query.perPage) || config.perPageItem
+        let orderBy = req.query.orderBy || config.orderBy
+        let orderType = req.query.orderType || config.orderType
+
         let answerList
         let userId = req.query.userId
         let postId = req.query.postId
 
         if (!userId && !postId) {
-            answerList = await Answer.getListAnswer(page, perPage)
-        } else if(userId && !postId){
-            answerList = await Answer.getListAnswerByUserId(userId, page, perPage)
+            answerList = await Answer.getListAnswer(page, perPage, orderBy, orderType)
+        } else if(userId && !postId){   
+            let user = await User.getUser(userId)
+            if (!user){
+                return res.status(400).json({
+                    success: false,
+                    message: `Cannot find user with userId = ${userId}`
+                })
+            }
+            
+            answerList = await Answer.getListAnswerByUserId(userId, page, perPage, orderBy, orderType)
         } else if (!userId && postId){
-            answerList= await Answer.getListAnswerByPostId(postId, page, perPage)
+            let post = await Post.getPost(postId)
+            if (!post){
+                return res.status(400).json({
+                    success: false,
+                    message: `Cannot find post with userId = ${post}`
+                })
+            }
+
+            answerList= await Answer.getListAnswerByPostId(postId, page, perPage, orderBy, orderType)
+            
+            let postView = await Post.editPost({viewNum: post.viewNum + 1}, postId)
         }
         //lấy số upvote và downvote cho answer(cần thì viết ko thfi có rồi)
 
@@ -182,6 +204,7 @@ exports.getAnswerList = async function (req, res) {
             result: answerList
         })
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: error
@@ -202,15 +225,17 @@ exports.createAnswer = async function (req, res) {
             })
         }
 
-        let count = await Answer.createAnswer(req.jwtDecoded.Id, req.body.postId, req.body.answerDetail);
-        let answer = await Answer.getAnswerByUserIdAndPostId(req.jwtDecoded.Id, req.body.postId)
-
-        if (count == 0) {
+        let id = await Answer.createAnswer(req.jwtDecoded.Id, req.body.postId, req.body.answerDetail);
+        
+        if (id == 0) {
             return res.status(404).json({
                 success: false,
                 message: `Cannot create answer `
             })
         }
+
+        let answer = await Answer.getAnswer(id)
+
 
         return res.status(200).json({
             success: true,
@@ -288,7 +313,7 @@ exports.deleteAnswer = async function (req, res) {
              })
          }
 
-        let answerVoteCount = await AnswerVote.deleteUserVoteByAnswerId(req.body.answerId)  
+        // let answerVoteCount = await AnswerVote.deleteUserVoteByAnswerId(req.body.answerId)  
         let count = await Answer.deleteAnswer(req.body.answerId)
         
 

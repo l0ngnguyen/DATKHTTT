@@ -20,3 +20,7 @@ exports.pageItem = process.env.PAGE_ITEM || 1
 exports.perPageItem = process.env.PER_PAGE_ITEM || 50
 exports.frontendHost = (process.env.FRONTEND_HOST && process.env.FRONTEND_HOST.split(" ")) || ["http://localhost:3000", "http://localhost:3000/", "http://localhost:3001"]
 exports.googleClientID = process.env.GOOGLE_CLIENT_ID || "846925863530-akeqgusm19k4dgicm7ncbl1jlsdi48m2.apps.googleusercontent.com"
+exports.orderBy = process.env.ORDER_BY || "Id"
+exports.orderType = process.env.ORDER_TYPE || "ASC"
+
+

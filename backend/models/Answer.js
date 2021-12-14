@@ -1,24 +1,99 @@
 const knex = require('./database')
 const config = require('../config/config')
 
-exports.getListAnswer = (page, perPage) => {
-    return knex.select().table('Answer').paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+exports.getListAnswer = (page, perPage, orderBy, orderType) => {
+    return knex.from('Answer').select(
+        '*',
+        knex('Answer_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
+            .andWhere('voteType', true)
+            .as('upVoteNum'),
+
+        knex('Answer_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
+            .andWhere('voteType', false)
+            .as('downVoteNum'),
+    )
+    .orderBy(orderBy, orderType)
+    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
-exports.getListAnswerByUserId = (userId, page, perPage) => {
-    return knex.select().table('Answer').where('userId', userId).paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+exports.getListAnswerByUserId = (userId, page, perPage, orderBy, orderType) => {
+    return knex.from('Answer').select(
+        '*',
+        knex('Answer_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
+            .andWhere('voteType', true)
+            .as('upVoteNum'),
+
+        knex('Answer_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
+            .andWhere('voteType', false)
+            .as('downVoteNum'),
+    )
+    .where('userId', userId)
+    .orderBy(orderBy, orderType)
+    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
-exports.getListAnswerByPostId = (postId, page, perPage) => {
-    return knex.select().table('Answer').where('postId', postId).paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+exports.getListAnswerByPostId = (postId, page, perPage, orderBy, orderType) => {
+    return knex.from('Answer').select(
+        '*',
+        knex('Answer_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
+            .andWhere('voteType', true)
+            .as('upVoteNum'),
+
+        knex('Answer_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
+            .andWhere('voteType', false)
+            .as('downVoteNum'),
+    )
+    .where('postId', postId)
+    .orderBy(orderBy, orderType)
+    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
 exports.getAnswer = (answerId) => {
-    return knex('Answer').where('Id', answerId).first()
+    return knex.from('Answer').select(
+        '*',
+        knex('Answer_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
+            .andWhere('voteType', true)
+            .as('upVoteNum'),
+
+        knex('Answer_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
+            .andWhere('voteType', false)
+            .as('downVoteNum'),
+    )
+    .where('Id', answerId).first()
 }
 
 exports.getAnswerByUserIdAndPostId = (userId, postId) => {
-    return knex('Answer').where('userID', userId).andWhere('postId', postId).first()
+    return knex.from('Answer').select(
+        '*',
+        knex('Answer_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
+            .andWhere('voteType', true)
+            .as('upVoteNum'),
+
+        knex('Answer_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
+            .andWhere('voteType', false)
+            .as('downVoteNum'),
+    )
+    .where('userID', userId).andWhere('postId', postId).first()
 }
 
 exports.createAnswer = ( userId, postId, answerDetail) => {

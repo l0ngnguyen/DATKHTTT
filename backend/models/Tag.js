@@ -4,25 +4,64 @@ const config = require('../config/config')
 
 //Use for auth login
 
-exports.getListTag = (page, perPage) => {
-    return knex.select().table('Tag').paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+exports.getListTag = (page, perPage, orderBy, orderType) => {
+    return knex.from('Tag').select(
+        '*',
+        knex('Post_Tag')
+            .count('*')
+            .whereRaw('?? = ??', ['Post_Tag.tagId', 'Tag.Id'])
+            .as('postNum'),
+    )
+    .orderBy(orderBy, orderType)
+    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
-exports.getListTagByUserId = (userId, page, perPage) => {
-    return knex.select().table('Tag').where('userId', userId).paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+exports.getListTagByUserId = (userId, page, perPage, orderBy, orderType) => {
+    return knex.from('Tag').select(
+        '*',
+        knex('Post_Tag')
+            .count('*')
+            .whereRaw('?? = ??', ['Post_Tag.tagId', 'Tag.Id'])
+            .as('postNum'),
+    )
+    .where('userId', userId)
+    .orderBy(orderBy, orderType)
+    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
 exports.getTag = (tagId) => {
-    return knex('Tag').where('Id', tagId).first()
+    return knex.from('Tag').select(
+        '*',
+        knex('Post_Tag')
+            .count('*')
+            .whereRaw('?? = ??', ['Post_Tag.tagId', 'Tag.Id'])
+            .as('postNum'),
+    )
+    .where('Id', tagId).first()
 }
 
 exports.getTagByTagName = (tagName) => {
-    return knex('Tag').where('tagName', tagName).first()
+    return knex.from('Tag').select(
+        '*',
+        knex('Post_Tag')
+            .count('*')
+            .whereRaw('?? = ??', ['Post_Tag.tagId', 'Tag.Id'])
+            .as('postNum'),
+    )
+    .where('tagName', tagName).first()
 }
 
-exports.searchTag = (query) => {
-    return knex('Tag')
-        .where('tagName', 'like', `%${query}%`)
+exports.searchTag = (query, page, perPage, orderBy, orderType) => {
+    return knex.from('Tag').select(
+        '*',
+        knex('Post_Tag')
+            .count('*')
+            .whereRaw('?? = ??', ['Post_Tag.tagId', 'Tag.Id'])
+            .as('postNum'),
+    )
+    .where('tagName', 'like', `%${query}%`)
+    .orderBy(orderBy, orderType)
+    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 exports.createTag = (tag, userId) => {
     return knex('Tag').insert({
