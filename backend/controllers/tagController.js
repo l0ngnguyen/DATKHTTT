@@ -4,6 +4,7 @@ const Tag = require('../models/Tag')
 const PostTag = require('../models/PostTag')
 const PostVote = require('../models/PostVote')
 const config = require('../config/config')
+const User = require('../models/User')
 const jwtHelper = require('../helpers/jwtToken')
 
 
@@ -36,13 +37,23 @@ exports.getTagList = async function (req, res) {
     try {
         let page = parseInt(req.query.page) || config.pageItem
         let perPage = parseInt(req.query.perPage) || config.perPageItem
+        let orderBy = req.query.orderBy || config.orderBy
+        let orderType = req.query.orderType || config.orderType
+
         let tagList
         let userId = req.query.userId
 
         if (!userId){
-            tagList = await Tag.getListTag(page, perPage)
+            tagList = await Tag.getListTag(page, perPage, orderBy, orderType)
         } else {
-            tagList = await Tag.getListTagByUserId(userId, page, perPage)
+            let user = await User.getUser(userId)
+            if (!user){
+                return res.status(400).json({
+                    success: false,
+                    message: `Cannot find tags of user with userId = ${userId}`
+                })
+            }
+            tagList = await Tag.getListTagByUserId(userId, page, perPage, orderBy, orderType)
         }
 
         if (tagList.data.length == 0) {
@@ -66,9 +77,13 @@ exports.getTagList = async function (req, res) {
 
 exports.searchTag = async function (req, res) {
     try {
+        let page = parseInt(req.query.page) || config.pageItem
+        let perPage = parseInt(req.query.perPage) || config.perPageItem
+        let orderBy = req.query.orderBy || config.orderBy
+        let orderType = req.query.orderType || config.orderType
         let query = req.query.query
 
-        let tags = await Tag.searchTag(query)
+        let tags = await Tag.searchTag(query, page, perPage, orderBy, orderType)
 
         return res.status(200).json({
             success: true,

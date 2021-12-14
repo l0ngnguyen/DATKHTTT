@@ -3,6 +3,7 @@ const Post = require('../models/Post')
 const Tag = require('../models/Tag')
 const PostTag = require('../models/PostTag')
 const PostVote = require('../models/PostVote')
+const User = require('../models/User')
 const config = require('../config/config')
 const jwtHelper = require('../helpers/jwtToken')
 const Answer = require('../models/Answer')
@@ -186,13 +187,24 @@ exports.getPostList = async function (req, res) {
     try {
         let page = parseInt(req.query.page) || config.pageItem
         let perPage = parseInt(req.query.perPage) || config.perPageItem
+
         let postList
         let userId = req.query.userId
 
+        let orderBy = req.query.orderBy || config.orderBy
+        let orderType = req.query.orderType || config.orderType
+
         if (!userId) {
-            postList = await Post.getListPost(page, perPage)
+            postList = await Post.getListPost(page, perPage, orderBy, orderType)
         } else {
-            postList = await Post.getListPostByUserId(userId, page, perPage)
+            let user = await User.getUser(userId)
+            if (!user){
+                return res.status(400).json({
+                    success: false,
+                    message: `Cannot find tags of user with userId = ${userId}`
+                })
+            }
+            postList = await Post.getListPostByUserId(userId, page, perPage, orderBy, orderType)
         }
 
         // for (var post of postList.data) {
@@ -225,6 +237,7 @@ exports.getPostList = async function (req, res) {
             result: postList
         })
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: error
@@ -234,9 +247,14 @@ exports.getPostList = async function (req, res) {
 
 exports.searchPost = async function (req, res) {
     try {
-        let query = req.query.query
+        let page = parseInt(req.query.page) || config.pageItem
+        let perPage = parseInt(req.query.perPage) || config.perPageItem
 
-        let posts = await Post.searchPost(query)
+        let orderBy = req.query.orderBy || config.orderBy
+        let orderType = req.query.orderType || config.orderType
+
+        let query = req.query.query
+        let posts = await Post.searchPost(query, page, perPage, orderBy, orderType)
 
         // list cac tag cua moi post
         // for (var post of posts) {
@@ -269,18 +287,23 @@ exports.searchPost = async function (req, res) {
 //tạo post mới
 exports.createPost = async function (req, res) {
     try {
-        let count = await Post.createPost(req.body, req.jwtDecoded.Id);
-        let post = await Post.getPostByPostName(req.body.postName)
-
-        for (let index in req.body.postTags) {
-            let count = await PostTag.addTagToPost(post.Id, req.body.postTags[index])
-        }
-
-        if (count == 0) {
+        let id = await Post.createPost(req.body, req.jwtDecoded.Id);
+        if (id == 0) {
             return res.status(404).json({
                 success: false,
                 message: `Cannot create post `
             })
+        }
+        let message = []
+        let post = await Post.getPost(id)
+        for (let index in req.body.postTags) {
+            try {
+                let count = await PostTag.addTagToPost(post.Id, req.body.postTags[index])
+            }
+            catch(error){
+                message.push(`Can not add tag with id = ${req.body.postTags[index]}, tag does not exist`)
+                continue;
+            }
         }
 
         // //laasy casc tak da chen duoc
@@ -298,6 +321,7 @@ exports.createPost = async function (req, res) {
 
         return res.status(200).json({
             success: true,
+            message: message,
             result: post
         })
 
@@ -393,12 +417,12 @@ exports.deletePost = async function (req, res) {
             })
         }
 
-        //xoas cac tag khoi post (them vao luc lam bang co khoa ngoai de no khong loi)
-        let ansVoteCount = await AnswerVote.deleteUserVoteByPostId(req.body.postId)
-        let answerCount = await Answer.deleteAnswersByPostId(req.body.postId)
+        // //xoas cac tag khoi post (them vao luc lam bang co khoa ngoai de no khong loi)
+        // let ansVoteCount = await AnswerVote.deleteUserVoteByPostId(req.body.postId)
+        // let answerCount = await Answer.deleteAnswersByPostId(req.body.postId)
 
-        //xoá post
-        let postVoteCount = await PostVote.deleteUserVoteByPosstId(req.body.postId)
+        // //xoá post
+        // let postVoteCount = await PostVote.deleteUserVoteByPosstId(req.body.postId)
         let postCount = await Post.deletePost(req.body.postId)
 
         if (postCount == 0) {
