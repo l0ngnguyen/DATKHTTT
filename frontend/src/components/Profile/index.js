@@ -42,13 +42,13 @@ const link = [
         component: <MyProfile />,
     },
     {
-        title: 'My posts',
+        title: 'Posts',
         path: 'my-post',
         tab: 2,
         component: <MyPost />,
     },
     {
-        title: 'My answers',
+        title: 'Answers',
         path: 'my-answer',
         tab: 3,
         component: <MyAnswer />,

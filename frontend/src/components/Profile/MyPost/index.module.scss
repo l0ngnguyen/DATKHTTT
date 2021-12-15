@@ -1,0 +1,89 @@
+.myPost {
+    max-width: 1120px;
+    margin: 0 auto;
+
+    .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .title {
+            font-weight: bold;
+            font-size: 24px;
+            color: #000000;
+        }
+
+        .groupButton {
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1.5px solid #096dd9;
+
+            .button {
+                padding: 6px 20px;
+                cursor: pointer;
+                border-radius: 6px;
+            }
+
+            .active {
+                background-color: #096dd9;
+                color: #FFFFFF;
+                transition-duration: 0.35s;
+            }
+        }
+
+    }
+
+    .list {
+        margin-top: 30px;
+
+        .oneItem {
+            padding: 20px;
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            cursor: pointer;
+
+            .topItem {
+                display: flex;
+                align-items: center;
+
+                .answer {
+                    background-color: #00922c;
+                    color: #FFFFFF;
+                    padding: 2px 8px;
+                    margin-right: 10px;
+                    border-radius: 4px;
+                }
+
+                .view {
+                    color: #a8071a;
+                    margin: 0px 10px;
+                }
+            }
+
+            .itemTitle {
+                font-size: 18px;
+                color: #096dd9;
+                margin: 10px 0px 5px 0px;
+                max-width: 80%;
+            }
+
+            .bottom {
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+
+                .content {
+                    // margin-left: 20px;
+                }
+
+                .time {
+                    color: rgba(0, 0, 0, 0.4);
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+}
