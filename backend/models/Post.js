@@ -4,6 +4,11 @@ const config = require('../config/config')
 exports.getListPost = (page, perPage, orderBy, orderType) => {
     return knex.from('Post').select(
         '*',
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            .as('postUserName'),
+            
         knex('Answer')
             .count('*')
             .whereRaw('?? = ??', ['Answer.postId', 'Post.Id'])
@@ -28,6 +33,11 @@ exports.getListPost = (page, perPage, orderBy, orderType) => {
 exports.getListPostByUserId = (userId, page, perPage, orderBy, orderType) => {
     return knex.from('Post').select(
         '*',
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            .as('postUserName'),
+
         knex('Answer')
             .count('*')
             .whereRaw('?? = ??', ['Answer.postId', 'Post.Id'])
@@ -53,6 +63,11 @@ exports.getListPostByUserId = (userId, page, perPage, orderBy, orderType) => {
 exports.getPost = (postId) => {
     return knex.from('Post').select(
         '*',
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            .as('postUserName'),
+
         knex('Answer')
             .count('*')
             .whereRaw('?? = ??', ['Answer.postId', 'Post.Id'])
@@ -76,6 +91,11 @@ exports.getPost = (postId) => {
 exports.getPostByPostName = (postName) => {
     return knex.from('Post').select(
         '*',
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            .as('postUserName'),
+
         knex('Answer')
             .count('*')
             .whereRaw('?? = ??', ['Answer.postId', 'Post.Id'])
@@ -99,6 +119,11 @@ exports.getPostByPostName = (postName) => {
 exports.searchPost = (query, page, perPage, orderBy, orderType) => {
     return knex.from('Post').select(
         '*',
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            .as('postUserName'),
+
         knex('Answer')
             .count('*')
             .whereRaw('?? = ??', ['Answer.postId', 'Post.Id'])
