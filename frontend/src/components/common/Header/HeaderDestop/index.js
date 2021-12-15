@@ -25,6 +25,7 @@ const HeaderDestop = () => {
     const [logged, setLogged] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [refresh, setRefresh] = useState(false);
+    const [keySearch, setKeySearch] = useState();
 
     useEffect(() => {
         getUserData();
@@ -67,6 +68,13 @@ const HeaderDestop = () => {
         setIsModalVisible(false);
     };
 
+    const handleSearch = (e) => {
+        setKeySearch(e.target.value);
+        if (e.keyCode === 13) {
+            console.log(e.target.value);
+        }
+    }
+
     const menuLogout = (
         <Menu className={cx("menu-dropdown")}>
             <Menu.Item onClick={() => history.push('/profile')}>
@@ -85,12 +93,16 @@ const HeaderDestop = () => {
                     <img alt="logo" src={logoText} height={50} />
                 </div>
                 <div className={cx("middle")}>
-                    <input placeholder="Search..." className={cx("search")} />
+                    <input
+                        placeholder="Search..."
+                        className={cx("search")}
+                        onKeyUp={(e) => handleSearch(e)}
+                    />
                     <img alt="search-icon" src={searchIcon} height={18} />
                 </div>
                 <div className={cx("menu")}>
                     <Link to="/" className={cx("item")}>Home</Link>
-                    <Link to="/" className={cx("item")}>Post</Link>
+                    <Link to="/posts" className={cx("item")}>Post</Link>
                     <Link to="/tags" className={cx("item")}>Tags</Link>
                     <Link to="/" className={cx("item")}>Author</Link>
                     {logged ? (

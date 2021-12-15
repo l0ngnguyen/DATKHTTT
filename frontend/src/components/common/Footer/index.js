@@ -12,7 +12,7 @@ const Footer = () => {
                 <div className={cx("container")}>
                     <div>
                         <p><b>CONTACT :</b></p>
-                        <div>Email: da.tkhttt20211@soict.hust.edud.vn</div>
+                        <div>Email: da.tkhttt20211@soict.hust.edu.vn</div>
                         <p>Github: DATTHTTT.github.io</p>
                     </div>
                     <div>Address: Building B1 - HUST</div>
