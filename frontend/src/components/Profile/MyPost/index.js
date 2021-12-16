@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { URL } from '../../../const/index';
 import moment from 'moment';
 import { Pagination } from 'antd';
+import ReactMarkdown from 'react-markdown';
 
 const cx = cn.bind(styles);
 
@@ -26,7 +27,7 @@ const MyPost = () => {
     const getListPost = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${URL}/post/list?userId=${1}&page=${page}&perPage=${perPage}&orderBy=${orderBy}&orderType=desc`);
+            const res = await axios.get(`${URL}/post/list?userId=${userId}&page=${page}&perPage=${perPage}&orderBy=${orderBy}&orderType=desc`);
 
             if (res.status === 200) {
                 console.log(res);
@@ -68,7 +69,7 @@ const MyPost = () => {
                             <div className={cx("oneItem")} key={id}>
                                 <div className={cx("topItem")}>
                                     <div className={cx("answer")}>{post.numAnswer} answers</div>
-                                    <div>2 votes</div>
+                                    <div>{post.upVoteNum} votes</div>
                                     <div className={cx("view")}>{post.viewNum} views</div>
                                     <div>2 likes</div>
                                 </div>

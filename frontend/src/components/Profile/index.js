@@ -268,7 +268,7 @@ const Profile = () => {
                         >
                             <EditOutlined /> Edit profile
                         </div>
-                        <div className={cx("button")}>
+                        <div className={cx("button")} onClick={() => history.push("/posts/create-post")}>
                             <PlusCircleOutlined /> Create post
                         </div>
                     </div>

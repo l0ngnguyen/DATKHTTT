@@ -15,6 +15,7 @@ import SignUpModal from "./components/Register/SignUpWithGG";
 import Profile from "./components/Profile";
 import Tags from "./components/Tags";
 import Post from "./components/Posts";
+import CreatePost from "./components/Posts/CreatePost/CreatePost";
 
 function App() {
   return (
@@ -38,8 +39,11 @@ function App() {
         <Route exact path="/tags">
           <Tags />
         </Route>
-        <Route path="/posts">
+        <Route exact path="/posts">
           <Post />
+        </Route>
+        <Route path="/posts/create-post">
+          <CreatePost />
         </Route>
       </Switch>
     </Router>

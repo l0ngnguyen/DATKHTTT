@@ -8,6 +8,8 @@ import { URL } from '../../../const/index';
 import axios from "axios";
 import Loading from '../../common/Loading/index';
 import moment from 'moment';
+import { useHistory } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 
 const cx = cn.bind(styles);
 
@@ -19,7 +21,7 @@ const ListPost = () => {
     const [listPost, setListPost] = useState();
     const [loading, setLoading] = useState(true);
     const [total, setTotal] = useState(0);
-
+    const history = useHistory();
 
     useEffect(() => {
         getAllPost();
@@ -60,11 +62,15 @@ const ListPost = () => {
                             onClick={() => setOrderBy("numAnswer")}
                         >Most answers</div>
                         <div
+                            className={cx("filterButton-middle", orderBy === "date" && "active")}
+                            onClick={() => setOrderBy("date")}
+                        >Newest</div>
+                        <div
                             className={cx("filterButton-right", orderBy === "viewNum" && "active")}
                             onClick={() => setOrderBy("viewNum")}
                         >Most views</div>
                     </div>
-                    <div className={cx("button")}>
+                    <div className={cx("button")} onClick={() => history.push("/posts/create-post")}>
                         <PlusCircleOutlined /> Create new post
                     </div>
                 </div>
@@ -111,7 +117,7 @@ const ListPost = () => {
                                             >
                                                 <div className={cx("time")}>created {moment(post.date).format('MMMM Do YYYY, h:mm:ss a')}</div>
                                                 <div className={cx("author")}>
-                                                    <Avatar /> &nbsp; User {post.userId}
+                                                    <Avatar /> &nbsp; {post.postUserName}
                                                 </div>
                                             </Col>
                                         </Row>
