@@ -3,7 +3,7 @@ const postController = require('../controllers/postController')
 const authMiddleware = require('../middlewares/authentication')
 const notFound = require('./404')
 
-//chua viet API doc, doi lam duoc vote thi viet 
+
 postRouter.get('/id/:id', postController.getPost)
 postRouter.get('/list', postController.getPostList)
 postRouter.get('/search', postController.searchPost)
@@ -19,6 +19,13 @@ postRouter.post('/edit-post', postController.editPost)
 postRouter.post('/delete-post', postController.deletePost)
 postRouter.post('/set-right-answer', postController.setRightAnswer)
 postRouter.post('/delete-right-answer', postController.delRightAnswer)
+
+//chưa viet doc
+postRouter.get('/user/get-favorite-posts', postController.getFavoritePosts)
+postRouter.get('/user/get-like', postController.getUserLike)
+postRouter.post('/user/add-favorite-post', postController.addPostToFavorite)
+postRouter.post('/user/delete-favorite-post', postController.deletePostToFavorite)
+
 postRouter.use(notFound)
 
 

@@ -4,6 +4,7 @@ const Tag = require('../models/Tag')
 const PostTag = require('../models/PostTag')
 const PostVote = require('../models/PostVote')
 const User = require('../models/User')
+const FavoritePost = require('../models/FavoritePost') 
 const config = require('../config/config')
 const jwtHelper = require('../helpers/jwtToken')
 const Answer = require('../models/Answer')
@@ -201,7 +202,7 @@ exports.getPostList = async function (req, res) {
             if (!user){
                 return res.status(400).json({
                     success: false,
-                    message: `Cannot find tags of user with userId = ${userId}`
+                    message: `Cannot find user with userId = ${userId}`
                 })
             }
             postList = await Post.getListPostByUserId(userId, page, perPage, orderBy, orderType)
@@ -539,6 +540,128 @@ exports.delRightAnswer = async function (req, res) {
         })
 
     } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error
+        })
+    }
+}
+
+//lấy danh sách favorite post của người dùng
+exports.getFavoritePosts = async function (req, res) {
+    try {
+        let page = parseInt(req.query.page) || config.pageItem
+        let perPage = parseInt(req.query.perPage) || config.perPageItem
+
+        let orderBy = req.query.orderBy || config.orderBy
+        let orderType = req.query.orderType || config.orderType
+
+        let userId = req.jwtDecoded.Id
+
+        let user = await User.getUser(userId)
+            if (!user){
+                return res.status(400).json({
+                    success: false,
+                    message: `Cannot find user with userId = ${userId}`
+                })
+            }
+
+        let favoritePosts  = await FavoritePost.getFavoritePostsOfUser(userId, page, perPage, orderBy, orderType)
+        return res.status(200).json({
+            success: true,
+            result: favoritePosts
+        })
+
+    }catch (error){
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error
+        })
+    }
+}
+//kiểm tra xem người dùng đã like post này hay chưa
+
+exports.getUserLike = async function (req, res) {
+    try {
+        let post = await Post.getPost(req.body.postId)
+        if (!post){
+            return res.status(400).json({
+                success: false,
+                message: `Can not find post with id = ${req.body.postId}`
+            })
+        }
+        let userLike = await FavoritePost.getUserLikeOfPost(req.body.postId, req.jwtDecoded.Id)
+        return res.status(200).json({
+            success: true,
+            result: userLike
+        })
+    
+    } catch (error){
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error
+        })
+    }
+    
+}
+//thêm post vào sanh sách  favorite post
+
+
+exports.addPostToFavorite = async function (req, res) {
+    try {
+        //check xem post còn tồn tại hay không
+        let post = await Post.getPost(req.body.postId)
+        if (!post){
+            return res.status(400).json({
+                success: false,
+                message: `Can not find post with id = ${req.body.postId}`
+            })
+        }
+        //xoá like cũ trước ở post này của người dùng
+        let delFavoritePost  = await FavoritePost.deletePostFromFavorite(req.jwtDecoded.Id, req.body.postId)
+        let addFavoritePost = await FavoritePost.addPostToFavorite( req.body.postId, req.jwtDecoded.Id)
+        let likeResult = await FavoritePost.getUserLikeOfPost(req.body.postId, req.jwtDecoded.Id)
+
+        return res.status(200).json({
+            success: true,
+            result: likeResult
+        })
+        
+    }
+    catch (error){
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error
+        })
+    }
+}
+
+
+//xoá post khỏi danh sách  favorite post
+exports.deletePostToFavorite = async function (req, res) {
+    try {
+        //check xem post còn tồn tại hay không
+        let post = await Post.getPost(req.body.postId)
+        if (!post){
+            return res.status(400).json({
+                success: false,
+                message: `Can not find post with id = ${req.body.postId}`
+            })
+        }
+        //xoá like cũ trước ở post này của người dùng
+        let delFavoritePost  = await FavoritePost.deletePostFromFavorite(req.jwtDecoded.Id, req.body.postId)
+
+        return res.status(200).json({
+            success: true,
+            result: delFavoritePost
+        })
+        
+    }
+    catch (error){
         console.log(error)
         return res.status(500).json({
             success: false,

@@ -8,7 +8,7 @@ exports.getListPost = (page, perPage, orderBy, orderType) => {
             .select('userName')
             .whereRaw('?? = ??', ['Post.userId', 'User.Id'])
             .as('postUserName'),
-            
+
         knex('Answer')
             .count('*')
             .whereRaw('?? = ??', ['Answer.postId', 'Post.Id'])
@@ -25,9 +25,14 @@ exports.getListPost = (page, perPage, orderBy, orderType) => {
             .whereRaw('?? = ??', ['Post_Vote.postId', 'Post.Id'])
             .andWhere('voteType', false)
             .as('downVoteNum'),
+
+        knex('Favorite_Post')
+            .count('*')
+            .whereRaw('?? = ??', ['Favorite_Post.postId', 'Post.Id'])
+            .as('likeNum'),
     )
-    .orderBy(orderBy, orderType)
-    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+        .orderBy(orderBy, orderType)
+        .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
 exports.getListPostByUserId = (userId, page, perPage, orderBy, orderType) => {
@@ -54,10 +59,15 @@ exports.getListPostByUserId = (userId, page, perPage, orderBy, orderType) => {
             .whereRaw('?? = ??', ['Post_Vote.postId', 'Post.Id'])
             .andWhere('voteType', false)
             .as('downVoteNum'),
+
+        knex('Favorite_Post')
+            .count('*')
+            .whereRaw('?? = ??', ['Favorite_Post.postId', 'Post.Id'])
+            .as('likeNum'),
     )
-    .where('userId', userId)
-    .orderBy(orderBy, orderType)
-    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+        .where('userId', userId)
+        .orderBy(orderBy, orderType)
+        .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
 exports.getPost = (postId) => {
@@ -84,8 +94,13 @@ exports.getPost = (postId) => {
             .whereRaw('?? = ??', ['Post_Vote.postId', 'Post.Id'])
             .andWhere('voteType', false)
             .as('downVoteNum'),
+
+        knex('Favorite_Post')
+            .count('*')
+            .whereRaw('?? = ??', ['Favorite_Post.postId', 'Post.Id'])
+            .as('likeNum'),
     )
-    .where('Id', postId).first()
+        .where('Id', postId).first()
 }
 
 exports.getPostByPostName = (postName) => {
@@ -112,8 +127,13 @@ exports.getPostByPostName = (postName) => {
             .whereRaw('?? = ??', ['Post_Vote.postId', 'Post.Id'])
             .andWhere('voteType', false)
             .as('downVoteNum'),
+
+        knex('Favorite_Post')
+            .count('*')
+            .whereRaw('?? = ??', ['Favorite_Post.postId', 'Post.Id'])
+            .as('likeNum'),
     )
-    .where('postName', postName).first()
+        .where('postName', postName).first()
 }
 
 exports.searchPost = (query, page, perPage, orderBy, orderType) => {
@@ -140,10 +160,15 @@ exports.searchPost = (query, page, perPage, orderBy, orderType) => {
             .whereRaw('?? = ??', ['Post_Vote.postId', 'Post.Id'])
             .andWhere('voteType', false)
             .as('downVoteNum'),
+
+        knex('Favorite_Post')
+            .count('*')
+            .whereRaw('?? = ??', ['Favorite_Post.postId', 'Post.Id'])
+            .as('likeNum'),
     )
-    .where('postName', 'like', `%${query}%`)
-    .orderBy(orderBy, orderType)
-    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+        .where('postName', 'like', `%${query}%`)
+        .orderBy(orderBy, orderType)
+        .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 exports.createPost = (post, userId) => {
     return knex('Post').insert({
