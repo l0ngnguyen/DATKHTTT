@@ -49,8 +49,8 @@ const ListPost = () => {
             <div className={cx("container")}>
                 <div className={cx("top")}>
                     <div className={cx("top-left")}>
-                        <div className={cx("title")}>All questions</div>
-                        <div className={cx("subTitle")}>{total} questions</div>
+                        <div className={cx("title")}>All posts</div>
+                        <div className={cx("subTitle")}>{total} posts</div>
                     </div>
                     <div className={cx("filterButton")}>
                         <div

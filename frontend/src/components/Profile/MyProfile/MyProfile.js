@@ -61,9 +61,9 @@ const MyProfile = () => {
                         <div><b>Facebook link: </b> {userInfo.facebookLink}</div>
                         <div><b>Description: </b> {userInfo.description}</div>
                     </div>
-                    <div className={cx("title")}>Top posts</div>
+                    <div className={cx("title")}>Top answers</div>
                     <div className={cx("card")}>
-                        You hasn’t posted yet
+                        You hasn’t answered yet
                     </div>
                 </Col>
             </Row>
