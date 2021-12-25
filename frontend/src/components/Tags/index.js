@@ -108,7 +108,7 @@ const Tags = () => {
                                             </div>
                                             <div className={cx("card-footer")}>
                                                 <div>
-                                                    <b>12345</b>
+                                                    <b>{item.postNum}</b>
                                                     <div>questions</div>
                                                 </div>
                                                 <div>Created {moment((item.date), "YYYYMMDD").fromNow()}</div>
