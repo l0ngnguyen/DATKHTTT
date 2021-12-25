@@ -170,6 +170,12 @@ exports.getPost = async function (req, res) {
                 message: `Cannot find post with id = ${req.params.id}`
             })
         }
+        //laasy casc tak da chen duoc
+        let postTags = await PostTag.getTagsOfPost(post.Id)
+        post.postTags = []
+        for (var index in postTags) {
+            post.postTags.push(await Tag.getTag(postTags[index].tagId))
+        }
         return res.status(200).json({
             success: true,
             result: post
@@ -208,14 +214,15 @@ exports.getPostList = async function (req, res) {
             postList = await Post.getListPostByUserId(userId, page, perPage, orderBy, orderType)
         }
 
-        // for (var post of postList.data) {
-        //     //Lấy danh sách tag cho từng vote 
-        //     let postTags = await PostTag.getTagsOfPost(post.Id)
-        //     post.postTags = []
+        for (var post of postList.data) {
+            //Lấy danh sách tag cho từng vote 
+            let postTags = await PostTag.getTagsOfPost(post.Id)
+            post.postTags = []
 
-        //     for (var index in postTags) {
-        //         post.postTags.push(await Tag.getTag(postTags[index].tagId))
-        //     }
+            for (var index in postTags) {
+                post.postTags.push(await Tag.getTag(postTags[index].tagId))
+            }
+        }
 
         //     //lấy vote num cho từng vote
         //     post.voteNum = { upVote: 0, downVote: 0 }
@@ -257,20 +264,14 @@ exports.searchPost = async function (req, res) {
         let query = req.query.query
         let posts = await Post.searchPost(query, page, perPage, orderBy, orderType)
 
-        // list cac tag cua moi post
-        // for (var post of posts) {
-        //     let postTags = await PostTag.getTagsOfPost(post.Id)
-        //     post.postTags = []
-        //     for (var index in postTags) {
-        //         post.postTags.push(await Tag.getTag(postTags[index].tagId))
-        //     }
-
-        //     post.voteNum = { upVote: 0, downVote: 0 }
-        //     let upVote = await PostVote.getUpVoteNumOfPost(post.Id)
-        //     let downVote = await PostVote.getDownVoteNumOfPost(post.Id)
-        //     post.voteNum.upVote = upVote[0].voteNum
-        //     post.voteNum.downVote = downVote[0].voteNum
-        // }
+        //list cac tag cua moi post
+        for (var post of posts.data) {
+            let postTags = await PostTag.getTagsOfPost(post.Id)
+            post.postTags = []
+            for (var index in postTags) {
+                post.postTags.push(await Tag.getTag(postTags[index].tagId))
+            }
+        }
 
         return res.status(200).json({
             success: true,
@@ -278,6 +279,7 @@ exports.searchPost = async function (req, res) {
         })
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: error
@@ -307,12 +309,12 @@ exports.createPost = async function (req, res) {
             }
         }
 
-        // //laasy casc tak da chen duoc
-        // let postTags = await PostTag.getTagsOfPost(post.Id)
-        // post.postTags = []
-        // for (var index in postTags) {
-        //     post.postTags.push(await Tag.getTag(postTags[index].tagId))
-        // }
+        //laasy casc tak da chen duoc
+        let postTags = await PostTag.getTagsOfPost(post.Id)
+        post.postTags = []
+        for (var index in postTags) {
+            post.postTags.push(await Tag.getTag(postTags[index].tagId))
+        }
         // //lấy thông tin vote: mặc định mới tạo thì bằng 0 hết 
         // post.voteNum = { upVote: 0, downVote: 0 }
         // let upVote = await PostVote.getUpVoteNumOfPost(post.Id)
@@ -372,12 +374,12 @@ exports.editPost = async function (req, res) {
             let count = await PostTag.addTagToPost(post.Id, req.body.postTags[index])
         }
 
-        // //laasy casc tak da chen duoc
-        // let postTags = await PostTag.getTagsOfPost(post.Id)
-        // post.postTags = []
-        // for (var index in postTags) {
-        //     post.postTags.push(await Tag.getTag(postTags[index].tagId))
-        // }
+        //laasy casc tak da chen duoc
+        let postTags = await PostTag.getTagsOfPost(post.Id)
+        post.postTags = []
+        for (var index in postTags) {
+            post.postTags.push(await Tag.getTag(postTags[index].tagId))
+        }
 
         // //lấy vote num sau khi sửa
         // post.voteNum = { upVote: 0, downVote: 0 }
