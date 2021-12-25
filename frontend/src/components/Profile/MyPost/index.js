@@ -6,7 +6,7 @@ import Loading from '../../common/Loading';
 import { useSelector } from 'react-redux';
 import { URL, token } from '../../../const/index';
 import moment from 'moment';
-import { Modal, Pagination, message } from 'antd';
+import { Modal, Pagination, message, Tag } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -104,9 +104,10 @@ const MyPost = () => {
 											onClick={() => {
 												setPostSelected(post)
 												history.push({
-												pathname: '/posts/edit-post',
-												state: { postSelected: post }
-											})}}
+													pathname: '/posts/edit-post',
+													state: { postSelected: post }
+												})
+											}}
 										>
 											<EditOutlined /> Edit
 										</div>
@@ -129,6 +130,9 @@ const MyPost = () => {
 									<div className={cx("time")}>
 										{moment(post.date).format('MMMM Do YYYY, h:mm:ss a')}
 									</div>
+								</div>
+								<div style={{paddingTop: '10px'}}>
+									{post.postTags?.map((it, idx) => (<Tag color="geekblue">{it.tagName}</Tag>))}
 								</div>
 							</div>
 						)) : (<></>)

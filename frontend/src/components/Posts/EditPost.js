@@ -23,7 +23,7 @@ const EditPost = () => {
 	const history = useHistory();
 	const location = useLocation();
 	const post = location.state.postSelected;
-	const [defaultTags, setDefaultTags] = useState();
+	const [defaultTags, setDefaultTags] = useState(location.state.postSelected.postTags);
 
 	useEffect(() => {
 		handleSearch();
@@ -36,7 +36,6 @@ const EditPost = () => {
 			if (res.status === 200) {
 				const list = res.data.result.data;
 				setOptions(list);
-				// setDefaultTags(tagIds);
 			}
 		} catch (err) {
 			console.log(err);
@@ -61,13 +60,14 @@ const EditPost = () => {
 	const handleEditPost = async () => {
 		const bodyParam = {
 			token: token,
+			postId: post.Id,
 			postName: title,
 			postDetail: markdownContent,
 			postTags: listTag,
 
 		}
 		try {
-			const res = await axios.post(`${URL}/post/create-post`, bodyParam);
+			const res = await axios.post(`${URL}/post/edit-post`, bodyParam);
 			if (res.status === 200) {
 				console.log(res);
 				history.push("/profile?tab=my-post");
@@ -138,7 +138,7 @@ const EditPost = () => {
 									multiple
 									id="tags-outlined"
 									options={options}
-									// defaultValue={defaultTags}
+									defaultValue={defaultTags}
 									getOptionLabel={(option) => option.tagName}
 									filterSelectedOptions
 									renderInput={(params) => (
