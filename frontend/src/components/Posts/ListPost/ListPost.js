@@ -107,7 +107,7 @@ const ListPost = () => {
                                             <Col span={12}>
                                                 <div className={cx("title")}>{post.postName}</div>
                                                 <div className={cx("text")}>
-                                                    {post.postDetail}
+                                                    {post.postDetail.slice(0, 180)}
                                                 </div>
                                             </Col>
                                             <Col span={1}></Col>

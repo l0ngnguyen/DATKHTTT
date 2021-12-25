@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import styles from './CreatePost.module.scss';
+import styles from '../Posts/CreatePost/CreatePost.module.scss';
 import cn from 'classnames/bind';
-import Layout from '../../common/Layout/index';
+import Layout from '../common/Layout/index';
 import { Row, Input, Card } from 'antd';
-import { URL } from '../../../const/index';
+import { URL } from '../../const/index';
 import axios from 'axios';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import ReactMarkdown from 'react-markdown';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 const cx = cn.bind(styles);
 
-const CreatePost = () => {
+const EditPost = () => {
 	const [options, setOptions] = useState([]);
 	const [listTag, setListTag] = useState();
 	const [markdownContent, setMarkdownContent] = useState();
@@ -21,28 +21,44 @@ const CreatePost = () => {
 	const userId = useSelector(state => state.user.userId);
 	const token = window.localStorage.getItem("accessTokenSO");
 	const history = useHistory();
+	const location = useLocation();
+	const post = location.state.postSelected;
+	const [defaultTags, setDefaultTags] = useState();
 
 	useEffect(() => {
 		handleSearch();
-	}, [])
+	}, [post]);
 
 	const handleSearch = async (value) => {
-		console.log(value);
+		console.log(post);
 		try {
 			const res = await axios.get(`${URL}/tag/list?page=${1}&perPage=${10000}`);
 			if (res.status === 200) {
-				setOptions(res.data.result.data);
+				const list = res.data.result.data;
+				setOptions(list);
+				// setDefaultTags(tagIds);
 			}
 		} catch (err) {
 			console.log(err);
 		}
 	};
 
+	const getTagOfPost = async () => {
+		const post = location.state.postSelected;
+		try {
+			const res = await axios.get(`${URL}/post/tag?postId=${post.postId}`);
+			console.log("res", res);
+			return res.data.result;
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
 	const onSelect = (event, values) => {
 		setListTag(values.map((item, id) => item.Id));
 	};
 
-	const handleCreatePost = async () => {
+	const handleEditPost = async () => {
 		const bodyParam = {
 			token: token,
 			postName: title,
@@ -65,7 +81,7 @@ const CreatePost = () => {
 		<Layout>
 			<div className={cx("createPost")}>
 				<div className={cx("container")}>
-					<div className={cx("pageTitle")}>Create a new post</div>
+					<div className={cx("pageTitle")}>Edit post</div>
 					<div className={cx("body")}>
 						<div className={cx("left")}>
 							<div className={cx("oneField")}>
@@ -74,6 +90,7 @@ const CreatePost = () => {
 									Be specific and imagine you're asking a question to another person
 								</div>
 								<input
+									defaultValue={post.postName}
 									placeholder='e.g. How do I undo the most recent local commits in Git?'
 									className={cx("input")}
 									onChange={(e) => setTitle(e.target.value)}
@@ -89,6 +106,7 @@ const CreatePost = () => {
 									<div className={cx("markdown")}>
 										<b>Markdown</b>
 										<textarea
+											defaultValue={post.postDetail}
 											placeholder='e.g. # Git'
 											className={cx("input")}
 											onChange={(e) => setMarkdownContent(e.target.value)}
@@ -100,7 +118,7 @@ const CreatePost = () => {
 										<b>Preview</b>
 										<div className={cx("box")}>
 											<ReactMarkdown>
-												{markdownContent}
+												{post.postDetail}
 											</ReactMarkdown>
 										</div>
 									</div>
@@ -120,6 +138,7 @@ const CreatePost = () => {
 									multiple
 									id="tags-outlined"
 									options={options}
+									// defaultValue={defaultTags}
 									getOptionLabel={(option) => option.tagName}
 									filterSelectedOptions
 									renderInput={(params) => (
@@ -134,25 +153,20 @@ const CreatePost = () => {
 								{console.log("list", listTag)}
 							</div>
 						</div>
-						{/* <div className={cx("right")}>
-							<Card
-								title="Tips to create a post"
-							>
-								<div style={{ textAlign: 'justify' }}>
-									The community is here to help you with specific coding,
-									algorithm, or language problems.
-									<br /> <br />
-									Avoid asking opinion-based questions.
-								</div>
-							</Card>
-						</div> */}
 					</div>
-
-					<div
-						className={cx("button")}
-						onClick={handleCreatePost}
-					>
-						Create post
+					<div style={{ display: 'flex' }}>
+						<div
+							className={cx("button")}
+							onClick={handleEditPost}
+						>
+							Save
+						</div> &nbsp; &nbsp;
+						<div
+							className={cx("button")}
+							onClick={() => history.push("/profile?tab=my-post")}
+						>
+							Cancel
+						</div>
 					</div>
 				</div>
 			</div>
@@ -160,4 +174,4 @@ const CreatePost = () => {
 	)
 }
 
-export default CreatePost;
+export default EditPost;
