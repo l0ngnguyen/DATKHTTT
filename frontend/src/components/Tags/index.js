@@ -34,8 +34,8 @@ const Tags = () => {
         try {
             const res = await axios.get(`${domain}/tag/search?query=${value}`);
             if (res.status === 200) {
-                console.log(res);
-                setList(res.data.result);
+                console.log("serch", res);
+                setList(res.data.result.data);
                 setTotal(res.data.result.length);
                 setLoading(false);
             }
@@ -108,7 +108,7 @@ const Tags = () => {
                                             </div>
                                             <div className={cx("card-footer")}>
                                                 <div>
-                                                    <b>12345</b>
+                                                    <b>{item.postNum}</b>
                                                     <div>questions</div>
                                                 </div>
                                                 <div>Created {moment((item.date), "YYYYMMDD").fromNow()}</div>

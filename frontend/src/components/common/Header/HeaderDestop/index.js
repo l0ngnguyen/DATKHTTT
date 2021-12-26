@@ -102,7 +102,7 @@ const HeaderDestop = () => {
                 </div>
                 <div className={cx("menu")}>
                     <Link to="/" className={cx("item")}>Home</Link>
-                    <Link to="/posts" className={cx("item")}>Post</Link>
+                    <Link to="/posts" className={cx("item")}>Posts</Link>
                     <Link to="/tags" className={cx("item")}>Tags</Link>
                     <Link to="/" className={cx("item")}>Author</Link>
                     {logged ? (

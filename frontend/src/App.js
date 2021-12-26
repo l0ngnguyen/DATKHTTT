@@ -4,10 +4,10 @@ import 'antd/dist/antd.css';
 import Homepage from "./components/Homepage";
 
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
+	BrowserRouter as Router,
+	Switch,
+	Route,
+	Link
 } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -16,38 +16,42 @@ import Profile from "./components/Profile";
 import Tags from "./components/Tags";
 import Post from "./components/Posts";
 import CreatePost from "./components/Posts/CreatePost/CreatePost";
+import EditPost from "./components/Posts/EditPost";
 
 function App() {
-  return (
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <Homepage />
-        </Route>
-        <Route path="/sign-in">
-          <Login />
-        </Route>
-        <Route path="/sign-up">
-          <Register />
-        </Route>
-        <Route path="/sign-up-with-google">
-          <SignUpModal />
-        </Route>
-        <Route path="/profile">
-          <Profile />
-        </Route>
-        <Route exact path="/tags">
-          <Tags />
-        </Route>
-        <Route exact path="/posts">
-          <Post />
-        </Route>
-        <Route path="/posts/create-post">
-          <CreatePost />
-        </Route>
-      </Switch>
-    </Router>
-  );
+	return (
+		<Router>
+			<Switch>
+				<Route exact path="/">
+					<Homepage />
+				</Route>
+				<Route path="/sign-in">
+					<Login />
+				</Route>
+				<Route path="/sign-up">
+					<Register />
+				</Route>
+				<Route path="/sign-up-with-google">
+					<SignUpModal />
+				</Route>
+				<Route path="/profile">
+					<Profile />
+				</Route>
+				<Route exact path="/tags">
+					<Tags />
+				</Route>
+				<Route exact path="/posts">
+					<Post />
+				</Route>
+				<Route path="/posts/create-post">
+					<CreatePost />
+				</Route>
+				<Route path="/posts/edit-post">
+					<EditPost />
+				</Route>
+			</Switch>
+		</Router>
+	);
 }
 
 export default App;
