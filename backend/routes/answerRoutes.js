@@ -3,7 +3,6 @@ const answerController = require('../controllers/answerController')
 const authMiddleware = require('../middlewares/authentication')
 const notFound = require('./404')
 
-//chua viet API doc, doi lam duoc vote thi viet 
 answerRouter.get('/id/:id', answerController.getAnswer)
 answerRouter.get('/list', answerController.getAnswerList)
 answerRouter.get('/vote-num', answerController.getVoteNum)
