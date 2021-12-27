@@ -14,6 +14,7 @@ userRouters.get('/username/:username', userController.getUserByUserName)
 
 userRouters.post('/upload-avatar/', imageUploadMiddlewares, userController.uploadImage)
 userRouters.get('/get-avatar/id/:id', userController.getAvatar)
+userRouters.get('/list', userController.getListUser)
 
 userRouters.use(authMiddleware.isAuth)
 userRouters.post('/link-with-google-account', userController.linkWithGoogleAccount)

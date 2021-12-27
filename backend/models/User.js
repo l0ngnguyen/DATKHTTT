@@ -9,11 +9,146 @@ exports.getUserByUserName = (username) => {
 }
 
 exports.getUserByEmail = (email) => {
-    return knex('User').where('email', email).first()
+    return knex.from('User').select(
+        '*',
+        knex('Post')
+            .count('Id')
+            .whereRaw('?? = ??', ['userId', 'User.Id'])
+            .as('numPost'),
+            
+        knex('Answer')
+            .count('Id')
+            .whereRaw('?? = ??', ['userId', 'User.Id'])
+            .as('numAnswer'),
+
+        knex("Post_Vote")
+            .count("userId")
+            .whereIn("postId", function () {
+                this.select('Id').from('Post').whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            })
+            .andWhere("voteType", true)
+            .as('numUpVotePost'),
+
+        knex("Post_Vote")
+            .count("userId")
+            .whereIn("postId", function () {
+                this.select('Id').from('Post').whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            })
+            .andWhere("voteType", false)
+            .as('numDownVotePost'),
+
+        knex("Answer_Vote")
+            .count("userId")
+            .whereIn("answerId", function () {
+                this.select('Id').from('Answer').whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            })
+            .andWhere("voteType", true)
+            .as('numUpVoteAnswer'),
+
+        knex("Answer_Vote")
+            .count("userId")
+            .whereIn("answerId", function () {
+                this.select('Id').from('Answer').whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            })
+            .andWhere("voteType", false)
+            .as('numDownVoteAnswer'),
+    )
+    .where('email', email).first()
 }
 
-exports.getUser = (userID) => {
-    return knex('User').where('Id', userID).first()
+exports.getUser = (userId) => {
+    return knex.from('User').select(
+        '*',
+        knex('Post')
+            .count('Id')
+            .where('Post.userId', userId)
+            .as('numPost'),
+        knex('Answer')
+            .count('Id')
+            .where('Answer.userId', userId)
+            .as('numAnswer'),
+        knex("Post_Vote")
+            .count("userId")
+            .whereIn("postId", function () {
+                this.select('Id').from('Post').where('userId', userId)
+            })
+            .andWhere("voteType", true)
+            .as('numUpVotePost'),
+
+        knex("Post_Vote")
+            .count("userId")
+            .whereIn("postId", function () {
+                this.select('Id').from('Post').where('userId', userId)
+            })
+            .andWhere("voteType", false)
+            .as('numDownVotePost'),
+
+        knex("Answer_Vote")
+            .count("userId")
+            .whereIn("answerId", function () {
+                this.select('Id').from('Answer').where('userId', userId)
+            })
+            .andWhere("voteType", true)
+            .as('numUpVoteAnswer'),
+
+        knex("Answer_Vote")
+            .count("userId")
+            .whereIn("answerId", function () {
+                this.select('Id').from('Answer').where('userId', userId)
+            })
+            .andWhere("voteType", false)
+            .as('numDownVoteAnswer'),
+    ).where('Id', userId).first()
+}
+
+//admin
+exports.getListUser = (page, perPage, orderBy, orderType) => {
+    return knex.from('User').select(
+        '*',
+        knex('Post')
+            .count('Id')
+            .whereRaw('?? = ??', ['userId', 'User.Id'])
+            .as('numPost'),
+            
+        knex('Answer')
+            .count('Id')
+            .whereRaw('?? = ??', ['userId', 'User.Id'])
+            .as('numAnswer'),
+
+        knex("Post_Vote")
+            .count("userId")
+            .whereIn("postId", function () {
+                this.select('Id').from('Post').whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            })
+            .andWhere("voteType", true)
+            .as('numUpVotePost'),
+
+        knex("Post_Vote")
+            .count("userId")
+            .whereIn("postId", function () {
+                this.select('Id').from('Post').whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            })
+            .andWhere("voteType", false)
+            .as('numDownVotePost'),
+
+        knex("Answer_Vote")
+            .count("userId")
+            .whereIn("answerId", function () {
+                this.select('Id').from('Answer').whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            })
+            .andWhere("voteType", true)
+            .as('numUpVoteAnswer'),
+
+        knex("Answer_Vote")
+            .count("userId")
+            .whereIn("answerId", function () {
+                this.select('Id').from('Answer').whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            })
+            .andWhere("voteType", false)
+            .as('numDownVoteAnswer'),
+    )
+    .orderBy(orderBy, orderType)
+    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
 exports.createUser = (user) => {
@@ -49,4 +184,9 @@ exports.editUser = (data, Id) => {
     return knex('User').where('Id', Id).update({
         ...data
     })
+}
+
+//admin
+exports.deleteUser = (userId) => {
+    return knex('User').where('Id', userId).del()
 }

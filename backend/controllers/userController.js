@@ -81,32 +81,6 @@ exports.getUserByEmail = async function (req, res) {
     }
 }
 
-exports.createUser = async function (req, res) {
-    try {
-
-        //phần này là để admin controller, phải authen role của tài khoản trước
-
-        let user = req.body
-        user.password = await bcrypt.hash(user.password, config.saltRounds)
-
-        let newUser = await User.createUser(req.body)
-        if (newUser.length == 0) {
-            return res.status(409).json({
-                success: false,
-                message: "Cannot create user"
-            })
-        }
-        return res.status(200).json({
-            success: true,
-            result: newUser,
-        })
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error
-        })
-    }
-}
 
 exports.uploadImage = async function (req, res) {
     try {
@@ -361,4 +335,37 @@ exports.changePassword = async (req, res) => {
             message: error.message
         });
     }
+}
+
+
+exports.getListUser = async function(req, res)  {
+    try {
+        let page = parseInt(req.query.page) || config.pageItem
+        let perPage = parseInt(req.query.perPage) || config.perPageItem
+
+        let orderBy = req.query.orderBy || config.orderBy
+        let orderType = req.query.orderType || config.orderType
+
+        let userList = await User.getListUser(page, perPage, orderBy, orderType)
+        
+        if (userList.data.length == 0) {
+            return res.status(200).json({
+                success: true,
+                result: userList,
+                message: "No user found"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            result: userList
+        })
+    } 
+    catch (error){
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    } 
 }

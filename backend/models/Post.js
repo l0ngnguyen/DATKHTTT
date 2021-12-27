@@ -170,6 +170,7 @@ exports.searchPost = (query, page, perPage, orderBy, orderType) => {
         .orderBy(orderBy, orderType)
         .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
+
 exports.createPost = (post, userId) => {
     return knex('Post').insert({
         userId: userId,
