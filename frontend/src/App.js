@@ -17,6 +17,7 @@ import Tags from "./components/Tags";
 import Post from "./components/Posts";
 import CreatePost from "./components/Posts/CreatePost/CreatePost";
 import EditPost from "./components/Posts/EditPost";
+import PostDetail from "./components/PostDetail";
 
 function App() {
 	return (
@@ -48,6 +49,9 @@ function App() {
 				</Route>
 				<Route path="/posts/edit-post">
 					<EditPost />
+				</Route>
+				<Route path="/post-detail/:id">
+					<PostDetail />
 				</Route>
 			</Switch>
 		</Router>
