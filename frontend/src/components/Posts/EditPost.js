@@ -14,14 +14,14 @@ import { useHistory, useLocation } from 'react-router-dom';
 const cx = cn.bind(styles);
 
 const EditPost = () => {
-	const [options, setOptions] = useState([]);
-	const [listTag, setListTag] = useState();
-	const [markdownContent, setMarkdownContent] = useState();
-	const [title, setTitle] = useState();
-	const userId = useSelector(state => state.user.userId);
 	const token = window.localStorage.getItem("accessTokenSO");
 	const history = useHistory();
 	const location = useLocation();
+	const [options, setOptions] = useState([]);
+	const [listTag, setListTag] = useState();
+	const [markdownContent, setMarkdownContent] = useState(location.state.postSelected.postDetail);
+	const [title, setTitle] = useState(location.state.postSelected.postName);
+	const userId = useSelector(state => state.user.userId);
 	const post = location.state.postSelected;
 	const [defaultTags, setDefaultTags] = useState(location.state.postSelected.postTags);
 
