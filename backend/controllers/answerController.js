@@ -189,7 +189,7 @@ exports.getAnswerList = async function (req, res) {
                 })
             }
 
-            answerList= await Answer.getListAnswerByPostId(postId, page, perPage, orderBy, orderType)
+            answerList= await Answer.getListAnswerByPostId(postId, page, perPage, orderBy, orderType, startDate, endDate)
             
             let postView = await Post.editPost({viewNum: post.viewNum + 1}, postId)
         }
