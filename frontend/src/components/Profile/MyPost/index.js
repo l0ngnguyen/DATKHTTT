@@ -132,7 +132,7 @@ const MyPost = () => {
 									</div>
 								</div>
 								<div style={{paddingTop: '10px'}}>
-									{post.postTags?.map((it, idx) => (<Tag color="geekblue">{it.tagName}</Tag>))}
+									{post.postTags?.map((it, idx) => (<Tag color="geekblue" key={idx}>{it.tagName}</Tag>))}
 								</div>
 							</div>
 						)) : (<></>)

@@ -2,7 +2,16 @@ import React, { useEffect, useState } from 'react';
 import styles from './PostDetail.module.scss';
 import cn from 'classnames/bind';
 import { Row, Col, Avatar } from 'antd';
-import { CaretDownOutlined, CaretUpOutlined, CheckCircleOutlined, CheckCircleTwoTone, HeartOutlined, HeartTwoTone, PlusCircleOutlined } from '@ant-design/icons';
+import {
+	CaretDownOutlined,
+	CaretUpOutlined,
+	CheckCircleOutlined,
+	CheckCircleTwoTone,
+	HeartOutlined,
+	HeartTwoTone,
+	PlusCircleOutlined,
+	HeartFilled,
+} from '@ant-design/icons';
 import { useHistory, useParams } from 'react-router-dom';
 import { Tag } from 'antd';
 import ReactMarkdown from 'react-markdown';
@@ -24,12 +33,18 @@ const Detail = () => {
 	const [voteType, setVoteType] = useState();
 	const [voteAnswer, setVoteAnswer] = useState();
 	const [voteOfPost, setVoteOfPost] = useState();
+	const [answerId, setAnswerId] = useState();
+	const [like, setLike] = useState(false);
+	const [voteOfAnswerById, setVoteOfAnswerById] = useState();
 
 	useEffect(() => {
 		getPostDetail();
 		getVoteOfPost();
-		getListAnswer();
 	}, []);
+
+	useEffect(() => {
+		getListAnswer();
+	}, [answerId]);
 
 	const getPostDetail = async () => {
 		setLoading(true);
@@ -125,13 +140,87 @@ const Detail = () => {
 		}
 	}
 
+	//answer
+
+	const getVoteOfAnswer = async (id) => {
+		try {
+			const res = await axios.get(`${URL}/answer/vote-num?answerId=${id}`);
+			if (res.status === 200) {
+				setVoteOfAnswerById(res.data.result);
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+	}
+
+	const handleVoteAnswer = async (voteType, id) => {
+		const check = await checkUserVotedAnswer(id);
+		console.log("check", check);
+		if (!check.length || voteType != check[0]?.voteType) {
+			handleCreateVoteForAnswer(voteType, id);
+		} else if (voteType == check[0]?.voteType) {
+			handleDeleteVoteForAnswer(id);
+		}
+	}
+
+	const handleCreateVoteForAnswer = async (voteType, id) => {
+		const bodyParams = {
+			token: token,
+			answerId: id,
+			voteType: voteType,
+		};
+
+		try {
+			const res = await axios.post(`${URL}/answer/user/create-vote`, bodyParams);
+			if (res.status === 200) {
+				getVoteOfAnswer(id);
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+	}
+
+	const handleDeleteVoteForAnswer = async (id) => {
+		const bodyParams = {
+			token: token,
+			answerId: id,
+		};
+
+		try {
+			const res = await axios.post(`${URL}/answer/user/delete-vote`, bodyParams);
+			if (res.status === 200) {
+				console.log("delete", res);
+				getVoteOfAnswer(id);
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+	}
+
+	const checkUserVotedAnswer = async (id) => {
+		const bodyParams = {
+			token: token,
+			answerId: id,
+		}
+
+		try {
+			const res = await axios.post(`${URL}/answer/user/get-vote`, bodyParams);
+			if (res.status == 200) {
+				console.log(res.data);
+				return res.data.result;
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+	}
+
 	return (
 		<div className={cx("post-detail")}>
 			{loading ? (<Loading />) : (
 				<div className={cx("container")}>
 					<div className={cx("header")}>
 						<Row>
-							<Col span={20}>
+							<Col span={18}>
 								<div className={cx("title")}>
 									{postData.postName}
 								</div>
@@ -154,6 +243,7 @@ const Detail = () => {
 									</div>
 								</div>
 							</Col>
+							<Col span={2}></Col>
 							<Col span={4}>
 								<div className={cx("button")} onClick={() => history.push("/posts/create-post")}>
 									<PlusCircleOutlined /> Create new post
@@ -185,17 +275,25 @@ const Detail = () => {
 									><CaretDownOutlined /></div>
 								</div>
 								<div className={cx("favorite")}>
-									<HeartTwoTone twoToneColor="#f5222d" className={cx("click-icon")} />
+									<div onClick={() => setLike(!like)}>
+										{like ? (
+											<HeartFilled style={{ color: '#f5222d' }} className={cx("click-icon")} />
+										) : (
+											<HeartTwoTone twoToneColor="#f5222d" className={cx("click-icon")} />
+										)}
+									</div>
+
 									<div style={{ fontSize: '14px', fontWeight: 'bold', color: "#8c8c8c" }}>{postData.likeNum} likes</div>
 								</div>
 							</Col>
-							<Col span={17}>
+							<Col span={16}>
 								<div className={cx("postDetail")}>
 									<ReactMarkdown>
 										{postData.postDetail}
 									</ReactMarkdown>
 								</div>
 							</Col>
+							<Col span={1}></Col>
 							<Col span={4}>
 								{postData.postTags ? postData.postTags?.map((tag, idx) => (
 									<Tag color="geekblue" key={idx}>{tag.tagName}</Tag>
@@ -229,21 +327,39 @@ const Detail = () => {
 									<Row>
 										<Col span={3}>
 											<div className={cx("upDown")}>
-												<div className={cx("icon")} className={cx("click-icon")}><CaretUpOutlined /></div>
-												<div>{answer.upVoteNum - answer.downVoteNum}</div>
-												<div className={cx("icon")} className={cx("click-icon")}><CaretDownOutlined /></div>
+												<div
+													className={cx("icon", "click-icon")}
+													onClick={() => {
+														setAnswerId(answer.Id);
+														setVoteAnswer(true);
+														handleVoteAnswer(true, answer.Id);
+													}}
+												><CaretUpOutlined /></div>
+												<div>
+													{voteOfAnswerById && answerId === answer.Id ? voteOfAnswerById.upVote - voteOfAnswerById.downVote
+														: answer.upVoteNum - answer.downVoteNum}
+												</div>
+												<div
+													className={cx("icon", "click-icon")}
+													onClick={() => {
+														setAnswerId(answer.Id);
+														setVoteAnswer(false);
+														handleVoteAnswer(false, answer.Id);
+													}}
+												><CaretDownOutlined /></div>
 											</div>
 											<div className={cx("favorite")}>
 												{answer.Id === postData.rightAnswerID && <CheckCircleTwoTone twoToneColor="#52c41a" />}
 											</div>
 										</Col>
-										<Col span={17}>
+										<Col span={16}>
 											<div className={cx("postDetail")}>
 												<ReactMarkdown>
 													{answer.answerDetail}
 												</ReactMarkdown>
 											</div>
 										</Col>
+										<Col span={1}></Col>
 										<Col span={4}>
 											<div>{moment(answer.date, 'YYYY-MM-DD').fromNow()}</div>
 											<div className={cx("author")}>
