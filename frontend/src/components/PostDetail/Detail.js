@@ -30,14 +30,13 @@ const Detail = () => {
 	const [postData, setPostData] = useState();
 	const [loading, setLoading] = useState(true);
 	const [listAnswer, setListAnswer] = useState();
-	const [orderBy, setOrderBy] = useState('upVoteNum');
 	const [voteType, setVoteType] = useState();
 	const [voteAnswer, setVoteAnswer] = useState();
 	const [voteOfPost, setVoteOfPost] = useState();
 	const [answerId, setAnswerId] = useState();
 	const [like, setLike] = useState(false);
 	const [voteOfAnswerById, setVoteOfAnswerById] = useState();
-	const [answerOrderBy, setAnswerOrderBy] = useState("upVoteNum");
+	const [answerOrderBy, setAnswerOrderBy] = useState('upVoteNum');
 	const [answerOrderType, setAnswerOrderType] = useState("asc");
 
 	useEffect(() => {
@@ -47,7 +46,7 @@ const Detail = () => {
 
 	useEffect(() => {
 		getListAnswer();
-	}, [answerId]);
+	}, [answerId, answerOrderType, answerOrderBy]);
 
 	const getPostDetail = async () => {
 		setLoading(true);
@@ -64,8 +63,9 @@ const Detail = () => {
 
 	const getListAnswer = async () => {
 		try {
-			const res = await axios.get(`${URL}/answer/list?page=1&perPage=1000&postId=${id}`);
+			const res = await axios.get(`${URL}/answer/list?page=1&perPage=1000&postId=${id}&orderBy=${answerOrderBy}&orderType=${answerOrderType}`);
 			if (res.status === 200) {
+				console.log("listAn", res);
 				setListAnswer(res.data.result.data);
 			}
 		} catch (err) {
@@ -225,6 +225,30 @@ const Detail = () => {
 		}
 	}
 
+	const handleFavoritePost = async (isLike) => {
+		checkLikedPost();
+	}
+
+	const checkLikedPost = async () => {
+		const bodyParam = {
+			token: token,
+			postId: id,
+		}
+		try {
+			const res = await axios.get(`${URL}/post/user/get-like?postId=${id}`, {
+				headers: {
+					"X-Auth-Token": token,
+					"content-type": "application/json"
+				}
+			});
+			if (res.status === 200) {
+				console.log(res);
+			}
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
 	return (
 		<div className={cx("post-detail")}>
 			{loading ? (<Loading />) : (
@@ -286,7 +310,10 @@ const Detail = () => {
 									><CaretDownOutlined /></div>
 								</div>
 								<div className={cx("favorite")}>
-									<div onClick={() => setLike(!like)}>
+									<div onClick={() => {
+										setLike(!like);
+										handleFavoritePost(!like);
+									}}>
 										{like ? (
 											<HeartFilled style={{ color: '#f5222d' }} className={cx("click-icon")} />
 										) : (
@@ -322,12 +349,18 @@ const Detail = () => {
 							<h1>{postData.numAnswer} Answers</h1>
 							<div className={cx("groupButton")}>
 								<div
-									className={cx("button", orderBy === "upVoteNum" && "active")}
-									onClick={() => setOrderBy("upVoteNum")}
+									className={cx("button", answerOrderBy === "upVoteNum" && "active")}
+									onClick={() => {
+										setAnswerOrderBy("upVoteNum");
+										setAnswerOrderType("asc");
+									}}
 								>Votes</div>
 								<div
-									className={cx("button", orderBy === "date" && "active")}
-									onClick={() => setOrderBy("date")}
+									className={cx("button", answerOrderBy === "date" && "active")}
+									onClick={() => {
+										setAnswerOrderBy("date");
+										setAnswerOrderType("desc");
+									}}
 								>Oldest</div>
 							</div>
 						</div>
@@ -372,7 +405,7 @@ const Detail = () => {
 										</Col>
 										<Col span={1}></Col>
 										<Col span={4}>
-											<div>{moment(answer.date, 'YYYY-MM-DD').fromNow()}</div>
+											<div style={{ fontSize: '12px' }}>{moment(answer.date).format('MMMM Do YYYY, h:mm:ss a')}</div>
 											<div className={cx("author")}>
 												<Avatar /> &nbsp; &nbsp;
 												<span>{answer?.postUserName}</span>
