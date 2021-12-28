@@ -22,5 +22,6 @@ exports.frontendHost = (process.env.FRONTEND_HOST && process.env.FRONTEND_HOST.s
 exports.googleClientID = process.env.GOOGLE_CLIENT_ID || "846925863530-akeqgusm19k4dgicm7ncbl1jlsdi48m2.apps.googleusercontent.com"
 exports.orderBy = process.env.ORDER_BY || "Id"
 exports.orderType = process.env.ORDER_TYPE || "ASC"
-
+exports.startDate = process.env.START_DATE || new Date('0001-01-01')
+exports.endDate = process.env.END_DATE || new Date('9999-12-31')
 

@@ -118,3 +118,17 @@ exports.deleteUser = async function (req, res) {
         })
     }
 }
+
+//lấy tổng số lượng user, post, tag, answer, upvote, downvote, favorite post trong một khoảng thời gian (truyền lên trong req)
+// mặc định là từ 1/1/1 đến 31/12/9999
+exports.getGeneralInfoAnalysis = async function(req, res){
+
+}
+//lấy số lượng user, post, tag, answer, upvote, downvote, favorite post mỗi ngày trong một khoảng thời gian (truyền lên trong request)
+// mặc định là từ 1/1/1 đến 31/12/9999
+exports.getDetailInfoAnalysis = async function(req, res){
+
+}
+
+
+//sửa lại các phương thức get list, search: thêm khoảng thời gian vào, set mặc định là từ 1/1/1 đến 31/12/9999

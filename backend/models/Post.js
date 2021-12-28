@@ -1,7 +1,7 @@
 const knex = require('./database')
 const config = require('../config/config')
 
-exports.getListPost = (page, perPage, orderBy, orderType) => {
+exports.getListPost = (page, perPage, orderBy, orderType, startDate, endDate) => {
     return knex.from('Post').select(
         '*',
         knex('User')
@@ -31,11 +31,12 @@ exports.getListPost = (page, perPage, orderBy, orderType) => {
             .whereRaw('?? = ??', ['Favorite_Post.postId', 'Post.Id'])
             .as('likeNum'),
     )
+        .where('date', '>=', startDate).andWhere('date', '<=', endDate)
         .orderBy(orderBy, orderType)
         .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
-exports.getListPostByUserId = (userId, page, perPage, orderBy, orderType) => {
+exports.getListPostByUserId = (userId, page, perPage, orderBy, orderType, startDate, endDate) => {
     return knex.from('Post').select(
         '*',
         knex('User')
@@ -66,6 +67,7 @@ exports.getListPostByUserId = (userId, page, perPage, orderBy, orderType) => {
             .as('likeNum'),
     )
         .where('userId', userId)
+        .where('date', '>=', startDate).andWhere('date', '<=', endDate)
         .orderBy(orderBy, orderType)
         .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
@@ -136,7 +138,7 @@ exports.getPostByPostName = (postName) => {
         .where('postName', postName).first()
 }
 
-exports.searchPost = (query, page, perPage, orderBy, orderType) => {
+exports.searchPost = (query, page, perPage, orderBy, orderType, startDate, endDate) => {
     return knex.from('Post').select(
         '*',
         knex('User')
@@ -167,6 +169,7 @@ exports.searchPost = (query, page, perPage, orderBy, orderType) => {
             .as('likeNum'),
     )
         .where('postName', 'like', `%${query}%`)
+        .where('date', '>=', startDate).andWhere('date', '<=', endDate)
         .orderBy(orderBy, orderType)
         .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }

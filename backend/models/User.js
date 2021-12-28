@@ -5,7 +5,51 @@ const config = require('../config/config')
 
 //Use for auth login
 exports.getUserByUserName = (username) => {
-    return knex('User').where('userName', username).first()
+    return knex.from('User').select(
+        '*',
+        knex('Post')
+            .count('Id')
+            .whereRaw('?? = ??', ['userId', 'User.Id'])
+            .as('numPost'),
+            
+        knex('Answer')
+            .count('Id')
+            .whereRaw('?? = ??', ['userId', 'User.Id'])
+            .as('numAnswer'),
+
+        knex("Post_Vote")
+            .count("userId")
+            .whereIn("postId", function () {
+                this.select('Id').from('Post').whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            })
+            .andWhere("voteType", true)
+            .as('numUpVotePost'),
+
+        knex("Post_Vote")
+            .count("userId")
+            .whereIn("postId", function () {
+                this.select('Id').from('Post').whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            })
+            .andWhere("voteType", false)
+            .as('numDownVotePost'),
+
+        knex("Answer_Vote")
+            .count("userId")
+            .whereIn("answerId", function () {
+                this.select('Id').from('Answer').whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            })
+            .andWhere("voteType", true)
+            .as('numUpVoteAnswer'),
+
+        knex("Answer_Vote")
+            .count("userId")
+            .whereIn("answerId", function () {
+                this.select('Id').from('Answer').whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            })
+            .andWhere("voteType", false)
+            .as('numDownVoteAnswer'),
+    )
+    .where('userName', username).first()
 }
 
 exports.getUserByEmail = (email) => {
@@ -102,7 +146,7 @@ exports.getUser = (userId) => {
 }
 
 //admin
-exports.getListUser = (page, perPage, orderBy, orderType) => {
+exports.getListUser = (page, perPage, orderBy, orderType, startDate, endDate) => {
     return knex.from('User').select(
         '*',
         knex('Post')
@@ -147,6 +191,7 @@ exports.getListUser = (page, perPage, orderBy, orderType) => {
             .andWhere("voteType", false)
             .as('numDownVoteAnswer'),
     )
+    .where('date', '>=', startDate).andWhere('date', '<=', endDate)
     .orderBy(orderBy, orderType)
     .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
