@@ -3,7 +3,7 @@ const config = require('../config/config')
 const { creteUserVote } = require('../controllers/postController')
 
 exports.getLikeNumOfPost = (postId) => {
-    return (knex("Favorite_Post").count("userId", {as: 'likeNum'}).where("postId", postId)
+    return (knex("Favorite_Post").count("userId", {as: 'likeNum'}).where("postId", postId).first()
     )
 }
 

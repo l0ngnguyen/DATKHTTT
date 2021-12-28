@@ -39,6 +39,31 @@ exports.getVoteNum = async function (req, res) {
             message: error
         })
     }
+}
+
+exports.getLikeNum = async function (req, res) {
+    //lấy vote num của vote đó
+    try {
+        let post = await Post.getPost(req.query.postId)
+        if (!post) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot find post with id = ${req.query.postId}`
+            })
+        }
+        let likeNum = await FavoritePost.getLikeNumOfPost(req.query.postId)
+
+        return res.status(200).json({
+            success: true,
+            result: likeNum
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error
+        })
+    }
 
 }
 
