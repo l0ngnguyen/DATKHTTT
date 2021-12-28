@@ -1,7 +1,7 @@
 const knex = require('./database')
 const config = require('../config/config')
 
-exports.getListAnswer = (page, perPage, orderBy, orderType) => {
+exports.getListAnswer = (page, perPage, orderBy, orderType, startDate, endDate) => {
     return knex.from('Answer').select(
         '*',
         knex('Answer_Vote')
@@ -16,11 +16,12 @@ exports.getListAnswer = (page, perPage, orderBy, orderType) => {
             .andWhere('voteType', false)
             .as('downVoteNum'),
     )
+    .where('date', '>=', startDate).andWhere('date', '<=', endDate)
     .orderBy(orderBy, orderType)
     .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
-exports.getListAnswerByUserId = (userId, page, perPage, orderBy, orderType) => {
+exports.getListAnswerByUserId = (userId, page, perPage, orderBy, orderType, startDate, endDate) => {
     return knex.from('Answer').select(
         '*',
         knex('Answer_Vote')
@@ -36,11 +37,12 @@ exports.getListAnswerByUserId = (userId, page, perPage, orderBy, orderType) => {
             .as('downVoteNum'),
     )
     .where('userId', userId)
+    .where('date', '>=', startDate).andWhere('date', '<=', endDate)
     .orderBy(orderBy, orderType)
     .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
-exports.getListAnswerByPostId = (postId, page, perPage, orderBy, orderType) => {
+exports.getListAnswerByPostId = (postId, page, perPage, orderBy, orderType, startDate, endDate) => {
     return knex.from('Answer').select(
         '*',
         knex('Answer_Vote')
@@ -56,6 +58,7 @@ exports.getListAnswerByPostId = (postId, page, perPage, orderBy, orderType) => {
             .as('downVoteNum'),
     )
     .where('postId', postId)
+    .where('date', '>=', startDate).andWhere('date', '<=', endDate)
     .orderBy(orderBy, orderType)
     .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }

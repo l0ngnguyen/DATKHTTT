@@ -8,6 +8,7 @@ const { OAuth2Client } = require('google-auth-library')
 const OAuthClient = new OAuth2Client(config.googleClientID)
 
 let nodemailer = require("nodemailer");
+const { query } = require('express')
 let tokenList = {}
 let otpList = {}
 
@@ -346,7 +347,10 @@ exports.getListUser = async function(req, res)  {
         let orderBy = req.query.orderBy || config.orderBy
         let orderType = req.query.orderType || config.orderType
 
-        let userList = await User.getListUser(page, perPage, orderBy, orderType)
+        let startDate = req.query.startDate ? new Date(req.query.startDate) : config.startDate
+        let endDate = req.query.endDate ? new Date(req.query.endDate) : config.endDate
+
+        let userList = await User.getListUser(page, perPage, orderBy, orderType, startDate, endDate)
         
         if (userList.data.length == 0) {
             return res.status(200).json({

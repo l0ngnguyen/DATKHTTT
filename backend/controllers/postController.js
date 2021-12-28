@@ -129,8 +129,6 @@ exports.deleteUserVote = async function (req, res) {
 }
 
 
-
-
 exports.getTags = async function (req, res){
     try {
         let post = await Post.getPost(req.query.postId)
@@ -201,8 +199,11 @@ exports.getPostList = async function (req, res) {
         let orderBy = req.query.orderBy || config.orderBy
         let orderType = req.query.orderType || config.orderType
 
+        let startDate = req.query.startDate ? new Date(req.query.startDate) : config.startDate
+        let endDate = req.query.endDate ? new Date(req.query.endDate) : config.endDate
+
         if (!userId) {
-            postList = await Post.getListPost(page, perPage, orderBy, orderType)
+            postList = await Post.getListPost(page, perPage, orderBy, orderType, startDate, endDate)
         } else {
             let user = await User.getUser(userId)
             if (!user){
@@ -211,7 +212,7 @@ exports.getPostList = async function (req, res) {
                     message: `Cannot find user with userId = ${userId}`
                 })
             }
-            postList = await Post.getListPostByUserId(userId, page, perPage, orderBy, orderType)
+            postList = await Post.getListPostByUserId(userId, page, perPage, orderBy, orderType, startDate, endDate)
         }
 
         for (var post of postList.data) {
@@ -261,8 +262,11 @@ exports.searchPost = async function (req, res) {
         let orderBy = req.query.orderBy || config.orderBy
         let orderType = req.query.orderType || config.orderType
 
+        let startDate = req.query.startDate ? new Date(req.query.startDate) : config.startDate
+        let endDate = req.query.endDate ? new Date(req.query.endDate) : config.endDate
+
         let query = req.query.query
-        let posts = await Post.searchPost(query, page, perPage, orderBy, orderType)
+        let posts = await Post.searchPost(query, page, perPage, orderBy, orderType, startDate, endDate)
 
         //list cac tag cua moi post
         for (var post of posts.data) {

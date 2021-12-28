@@ -4,7 +4,7 @@ const config = require('../config/config')
 
 //Use for auth login
 
-exports.getListTag = (page, perPage, orderBy, orderType) => {
+exports.getListTag = (page, perPage, orderBy, orderType, startDate, endDate) => {
     return knex.from('Tag').select(
         '*',
         knex('Post_Tag')
@@ -12,11 +12,12 @@ exports.getListTag = (page, perPage, orderBy, orderType) => {
             .whereRaw('?? = ??', ['Post_Tag.tagId', 'Tag.Id'])
             .as('postNum'),
     )
+    .where('date', '>=', startDate).andWhere('date', '<=', endDate)
     .orderBy(orderBy, orderType)
     .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
-exports.getListTagByUserId = (userId, page, perPage, orderBy, orderType) => {
+exports.getListTagByUserId = (userId, page, perPage, orderBy, orderType, startDate, endDate) => {
     return knex.from('Tag').select(
         '*',
         knex('Post_Tag')
@@ -24,6 +25,7 @@ exports.getListTagByUserId = (userId, page, perPage, orderBy, orderType) => {
             .whereRaw('?? = ??', ['Post_Tag.tagId', 'Tag.Id'])
             .as('postNum'),
     )
+    .where('date', '>=', startDate).andWhere('date', '<=', endDate)
     .where('userId', userId)
     .orderBy(orderBy, orderType)
     .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
@@ -51,7 +53,7 @@ exports.getTagByTagName = (tagName) => {
     .where('tagName', tagName).first()
 }
 
-exports.searchTag = (query, page, perPage, orderBy, orderType) => {
+exports.searchTag = (query, page, perPage, orderBy, orderType, startDate, endDate) => {
     return knex.from('Tag').select(
         '*',
         knex('Post_Tag')
@@ -60,6 +62,7 @@ exports.searchTag = (query, page, perPage, orderBy, orderType) => {
             .as('postNum'),
     )
     .where('tagName', 'like', `%${query}%`)
+    .where('date', '>=', startDate).andWhere('date', '<=', endDate)
     .orderBy(orderBy, orderType)
     .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }

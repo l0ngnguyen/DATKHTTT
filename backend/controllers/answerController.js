@@ -157,15 +157,19 @@ exports.getAnswerList = async function (req, res) {
     try {
         let page = parseInt(req.query.page) || config.pageItem
         let perPage = parseInt(req.query.perPage) || config.perPageItem
+
         let orderBy = req.query.orderBy || config.orderBy
         let orderType = req.query.orderType || config.orderType
+        
+        let startDate = req.query.startDate ? new Date(req.query.startDate) : config.startDate
+        let endDate = req.query.endDate ? new Date(req.query.endDate) : config.endDate
 
         let answerList
         let userId = req.query.userId
         let postId = req.query.postId
 
         if (!userId && !postId) {
-            answerList = await Answer.getListAnswer(page, perPage, orderBy, orderType)
+            answerList = await Answer.getListAnswer(page, perPage, orderBy, orderType, startDate, endDate)
         } else if(userId && !postId){   
             let user = await User.getUser(userId)
             if (!user){
@@ -175,7 +179,7 @@ exports.getAnswerList = async function (req, res) {
                 })
             }
             
-            answerList = await Answer.getListAnswerByUserId(userId, page, perPage, orderBy, orderType)
+            answerList = await Answer.getListAnswerByUserId(userId, page, perPage, orderBy, orderType, startDate, endDate)
         } else if (!userId && postId){
             let post = await Post.getPost(postId)
             if (!post){
@@ -185,7 +189,7 @@ exports.getAnswerList = async function (req, res) {
                 })
             }
 
-            answerList= await Answer.getListAnswerByPostId(postId, page, perPage, orderBy, orderType)
+            answerList= await Answer.getListAnswerByPostId(postId, page, perPage, orderBy, orderType, startDate, endDate)
             
             let postView = await Post.editPost({viewNum: post.viewNum + 1}, postId)
         }

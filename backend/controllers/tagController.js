@@ -37,14 +37,18 @@ exports.getTagList = async function (req, res) {
     try {
         let page = parseInt(req.query.page) || config.pageItem
         let perPage = parseInt(req.query.perPage) || config.perPageItem
+
         let orderBy = req.query.orderBy || config.orderBy
         let orderType = req.query.orderType || config.orderType
+
+        let startDate = req.query.startDate ? new Date(req.query.startDate) : config.startDate
+        let endDate = req.query.endDate ? new Date(req.query.endDate) : config.endDate
 
         let tagList
         let userId = req.query.userId
 
         if (!userId){
-            tagList = await Tag.getListTag(page, perPage, orderBy, orderType)
+            tagList = await Tag.getListTag(page, perPage, orderBy, orderType, startDate, endDate)
         } else {
             let user = await User.getUser(userId)
             if (!user){
@@ -53,7 +57,7 @@ exports.getTagList = async function (req, res) {
                     message: `Cannot find tags of user with userId = ${userId}`
                 })
             }
-            tagList = await Tag.getListTagByUserId(userId, page, perPage, orderBy, orderType)
+            tagList = await Tag.getListTagByUserId(userId, page, perPage, orderBy, orderType, startDate, endDate)
         }
 
         if (tagList.data.length == 0) {
@@ -79,11 +83,16 @@ exports.searchTag = async function (req, res) {
     try {
         let page = parseInt(req.query.page) || config.pageItem
         let perPage = parseInt(req.query.perPage) || config.perPageItem
+
         let orderBy = req.query.orderBy || config.orderBy
         let orderType = req.query.orderType || config.orderType
+
         let query = req.query.query
 
-        let tags = await Tag.searchTag(query, page, perPage, orderBy, orderType)
+        let startDate = req.query.startDate ? new Date(req.query.startDate) : config.startDate
+        let endDate = req.query.endDate ? new Date(req.query.endDate) : config.endDate
+
+        let tags = await Tag.searchTag(query, page, perPage, orderBy, orderType, startDate, endDate)
 
         return res.status(200).json({
             success: true,
