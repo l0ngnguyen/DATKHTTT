@@ -21,7 +21,7 @@ postRouter.post('/set-right-answer', postController.setRightAnswer)
 postRouter.post('/delete-right-answer', postController.delRightAnswer)
 
 //chưa viet doc
-postRouter.get('/user/get-favorite-posts', postController.getFavoritePosts)
+postRouter.post('/user/get-favorite-posts', postController.getFavoritePosts)
 postRouter.get('/user/get-like', postController.getUserLike)
 postRouter.post('/user/add-favorite-post', postController.addPostToFavorite)
 postRouter.post('/user/delete-favorite-post', postController.deletePostToFavorite)
