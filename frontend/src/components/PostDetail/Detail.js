@@ -6,7 +6,7 @@ import { CaretDownOutlined, CaretUpOutlined, CheckCircleOutlined, CheckCircleTwo
 import { useHistory, useParams } from 'react-router-dom';
 import { Tag } from 'antd';
 import ReactMarkdown from 'react-markdown';
-import { URL } from '../../const/index';
+import { URL, token } from '../../const/index';
 import axios from "axios";
 import Loading from '../common/Loading';
 import moment from 'moment';
@@ -21,9 +21,13 @@ const Detail = () => {
 	const [loading, setLoading] = useState(true);
 	const [listAnswer, setListAnswer] = useState();
 	const [orderBy, setOrderBy] = useState('upVoteNum');
+	const [voteType, setVoteType] = useState();
+	const [voteAnswer, setVoteAnswer] = useState();
+	const [voteOfPost, setVoteOfPost] = useState();
 
 	useEffect(() => {
 		getPostDetail();
+		getVoteOfPost();
 		getListAnswer();
 	}, []);
 
@@ -33,7 +37,6 @@ const Detail = () => {
 			const res = await axios.get(`${URL}/post/id/${id}`);
 			if (res.status === 200) {
 				setPostData(res.data.result);
-				console.log("id", res.data.result);
 				setLoading(false);
 			}
 		} catch (err) {
@@ -45,8 +48,77 @@ const Detail = () => {
 		try {
 			const res = await axios.get(`${URL}/answer/list?page=1&perPage=1000&postId=${id}`);
 			if (res.status === 200) {
-				console.log(res);
 				setListAnswer(res.data.result.data);
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+	}
+
+	const getVoteOfPost = async () => {
+		try {
+			const res = await axios.get(`${URL}/post/vote-num?postId=${id}`);
+			if (res.status === 200) {
+				setVoteOfPost(res.data.result);
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+	}
+
+	const handleVotePost = async (voteType) => {
+		const check = await checkUserVotedPost();
+		if (!check.length || voteType != check[0]?.voteType) {
+			handleCreateVoteForPost(voteType);
+		} else if (voteType == check[0]?.voteType) {
+			handleDeleteVoteForPost();
+		}
+	}
+
+	const handleCreateVoteForPost = async (voteType) => {
+		const bodyParams = {
+			token: token,
+			postId: id,
+			voteType: voteType,
+		};
+
+
+		try {
+			const res = await axios.post(`${URL}/post/user/create-vote`, bodyParams);
+			if (res.status === 200) {
+				getVoteOfPost();
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+	}
+
+	const handleDeleteVoteForPost = async () => {
+		const bodyParams = {
+			token: token,
+			postId: id,
+		};
+
+		try {
+			const res = await axios.post(`${URL}/post/user/delete-vote`, bodyParams);
+			if (res.status === 200) {
+				getVoteOfPost();
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+	}
+
+	const checkUserVotedPost = async () => {
+		const bodyParams = {
+			token: token,
+			postId: id,
+		}
+
+		try {
+			const res = await axios.post(`${URL}/post/user/get-vote`, bodyParams);
+			if (res.status == 200) {
+				return res.data.result;
 			}
 		} catch (err) {
 			console.log(err.response);
@@ -94,9 +166,23 @@ const Detail = () => {
 						<Row>
 							<Col span={3}>
 								<div className={cx("upDown")}>
-									<div className={cx("icon")}><CaretUpOutlined /></div>
-									<div>{postData.upVoteNum - postData.downVoteNum}</div>
-									<div className={cx("icon")}><CaretDownOutlined /></div>
+									<div
+										className={cx("icon")}
+										className={cx("click-icon")}
+										onClick={() => {
+											setVoteType(true);
+											handleVotePost(true);
+										}}
+									><CaretUpOutlined /></div>
+									<div>{voteOfPost ? voteOfPost.upVote - voteOfPost.downVote : '0'}</div>
+									<div
+										className={cx("icon")}
+										className={cx("click-icon")}
+										onClick={() => {
+											setVoteType(false);
+											handleVotePost(false);
+										}}
+									><CaretDownOutlined /></div>
 								</div>
 								<div className={cx("favorite")}>
 									<HeartTwoTone twoToneColor="#f5222d" className={cx("click-icon")} />
@@ -139,13 +225,13 @@ const Detail = () => {
 						<div className={cx("division")}></div>
 						{!listAnswer ? (<></>) :
 							listAnswer.map((answer, idx) => (
-								<div>
+								<div key={idx}>
 									<Row>
 										<Col span={3}>
 											<div className={cx("upDown")}>
-												<div className={cx("icon")}><CaretUpOutlined /></div>
+												<div className={cx("icon")} className={cx("click-icon")}><CaretUpOutlined /></div>
 												<div>{answer.upVoteNum - answer.downVoteNum}</div>
-												<div className={cx("icon")}><CaretDownOutlined /></div>
+												<div className={cx("icon")} className={cx("click-icon")}><CaretDownOutlined /></div>
 											</div>
 											<div className={cx("favorite")}>
 												{answer.Id === postData.rightAnswerID && <CheckCircleTwoTone twoToneColor="#52c41a" />}
