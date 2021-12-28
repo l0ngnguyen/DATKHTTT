@@ -15,7 +15,7 @@ import {
 import { useHistory, useParams } from 'react-router-dom';
 import { Tag } from 'antd';
 import ReactMarkdown from 'react-markdown';
-import { URL, token } from '../../const/index';
+import { URL } from '../../const/index';
 import axios from "axios";
 import Loading from '../common/Loading';
 import moment from 'moment';
@@ -24,6 +24,7 @@ const cx = cn.bind(styles);
 
 const Detail = () => {
 	const history = useHistory();
+	const token = window.localStorage.getItem("accessTokenSO");
 	const { id } = useParams();
 	const [markdownContent, setMarkdownContent] = useState();
 	const [postData, setPostData] = useState();
@@ -36,6 +37,8 @@ const Detail = () => {
 	const [answerId, setAnswerId] = useState();
 	const [like, setLike] = useState(false);
 	const [voteOfAnswerById, setVoteOfAnswerById] = useState();
+	const [answerOrderBy, setAnswerOrderBy] = useState("upVoteNum");
+	const [answerOrderType, setAnswerOrderType] = useState("asc");
 
 	useEffect(() => {
 		getPostDetail();
@@ -82,11 +85,16 @@ const Detail = () => {
 	}
 
 	const handleVotePost = async (voteType) => {
-		const check = await checkUserVotedPost();
-		if (!check.length || voteType != check[0]?.voteType) {
-			handleCreateVoteForPost(voteType);
-		} else if (voteType == check[0]?.voteType) {
-			handleDeleteVoteForPost();
+		if (token) {
+			const check = await checkUserVotedPost();
+			console.log("check", check);
+			if (!check?.length || voteType != check[0]?.voteType) {
+				handleCreateVoteForPost(voteType);
+			} else if (voteType == check[0]?.voteType) {
+				handleDeleteVoteForPost();
+			}
+		} else {
+			history.push("/sign-in");
 		}
 	}
 
@@ -118,6 +126,7 @@ const Detail = () => {
 			const res = await axios.post(`${URL}/post/user/delete-vote`, bodyParams);
 			if (res.status === 200) {
 				getVoteOfPost();
+				console.log("delete", res);
 			}
 		} catch (err) {
 			console.log(err.response);
@@ -154,12 +163,15 @@ const Detail = () => {
 	}
 
 	const handleVoteAnswer = async (voteType, id) => {
-		const check = await checkUserVotedAnswer(id);
-		console.log("check", check);
-		if (!check.length || voteType != check[0]?.voteType) {
-			handleCreateVoteForAnswer(voteType, id);
-		} else if (voteType == check[0]?.voteType) {
-			handleDeleteVoteForAnswer(id);
+		if (token) {
+			const check = await checkUserVotedAnswer(id);
+			if (!check?.length || voteType != check[0]?.voteType) {
+				handleCreateVoteForAnswer(voteType, id);
+			} else if (voteType == check[0]?.voteType) {
+				handleDeleteVoteForAnswer(id);
+			}
+		} else {
+			history.push("/sign-in");
 		}
 	}
 
@@ -189,7 +201,6 @@ const Detail = () => {
 		try {
 			const res = await axios.post(`${URL}/answer/user/delete-vote`, bodyParams);
 			if (res.status === 200) {
-				console.log("delete", res);
 				getVoteOfAnswer(id);
 			}
 		} catch (err) {
