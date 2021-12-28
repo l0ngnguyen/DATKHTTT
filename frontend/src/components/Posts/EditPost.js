@@ -118,7 +118,7 @@ const EditPost = () => {
 										<b>Preview</b>
 										<div className={cx("box")}>
 											<ReactMarkdown>
-												{post.postDetail}
+												{markdownContent}
 											</ReactMarkdown>
 										</div>
 									</div>
