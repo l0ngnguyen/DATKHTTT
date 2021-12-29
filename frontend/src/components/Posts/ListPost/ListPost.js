@@ -104,7 +104,7 @@ const ListPost = () => {
 												<div className={cx("text")}>views</div>
 											</Col>
 											<Col span={1}></Col>
-											<Col span={12}>
+											<Col span={12} onClick={() => history.push(`/post-detail/${post.Id}`)}>
 												<div className={cx("title")}>{post.postName}</div>
 												<div className={cx("text")}>
 													{post.postDetail.slice(0, 180)}

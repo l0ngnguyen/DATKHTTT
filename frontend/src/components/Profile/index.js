@@ -95,9 +95,6 @@ const Profile = () => {
 
     const onFinish = async (values) => {
         const token = window.localStorage.getItem("accessTokenSO");
-        // const config = {
-        //     headers: { 'x-access-token': `Bearer ${token}` }
-        // };
 
         const bodyParams = {
             'token': token,
