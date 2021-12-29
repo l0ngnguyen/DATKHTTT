@@ -8,6 +8,7 @@ postRouter.get('/id/:id', postController.getPost)
 postRouter.get('/list', postController.getPostList)
 postRouter.get('/search', postController.searchPost)
 postRouter.get('/vote-num', postController.getVoteNum)
+postRouter.get('/like-num', postController.getLikeNum)
 postRouter.get('/tag', postController.getTags)
 
 postRouter.use(authMiddleware.isAuth)
