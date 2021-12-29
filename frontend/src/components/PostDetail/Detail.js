@@ -44,7 +44,7 @@ const Detail = () => {
 		getPostDetail();
 		getVoteOfPost();
 		checkLikedPost();
-	}, [isLike]);
+	}, []);
 
 	useEffect(() => {
 		getListAnswer();
@@ -244,6 +244,7 @@ const Detail = () => {
 			const res = await axios.post(`${URL}/post/user/add-favorite-post`, bodyParam);
 			if (res.status === 200) {
 				setIsLike(true);
+				getLikeOfPost();
 			}
 		} catch (err) {
 			console.log(err);
@@ -259,6 +260,7 @@ const Detail = () => {
 			const res = await axios.post(`${URL}/post/user/delete-favorite-post`, bodyParam);
 			if (res.status === 200) {
 				setIsLike(false);
+				getLikeOfPost();
 			}
 		} catch (err) {
 			console.log(err);
@@ -278,6 +280,17 @@ const Detail = () => {
 				} else {
 					setIsLike(false);
 				}
+			}
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
+	const getLikeOfPost = async () => {
+		try {
+			const res = await axios.get(`${URL}/post/like-num?postId=${id}`);
+			if (res.status === 200) {
+				setLike(res.data.result.likeNum);
 			}
 		} catch (err) {
 			console.log(err);
@@ -356,7 +369,7 @@ const Detail = () => {
 										)}
 									</div>
 
-									<div style={{ fontSize: '14px', fontWeight: 'bold', color: "#8c8c8c" }}>{postData.likeNum} likes</div>
+									<div style={{ fontSize: '14px', fontWeight: 'bold', color: "#8c8c8c" }}>{like ? like : postData.likeNum} likes</div>
 								</div>
 							</Col>
 							<Col span={16}>
