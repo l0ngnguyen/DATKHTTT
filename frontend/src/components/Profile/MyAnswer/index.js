@@ -6,17 +6,12 @@ import Loading from '../../common/Loading';
 import { useSelector } from 'react-redux';
 import { URL, token } from '../../../const/index';
 import moment from 'moment';
-import { Modal, Pagination, message, Tag, Col, Row } from 'antd';
+import { Modal, Pagination, message, Tag, Col, Row, Form, Input, Button } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 
 const cx = cn.bind(styles);
-const text = `I accidentally committed the wrong files to Git, but didn't
-push the commit to the server yet.
-How can I undo those commits from the local repository?
-The only way seems to be to copy the edits in some kind of
-GUI text editor, then wipe the whole local clone, then re-clone the repository, 
-then re-applying the edits. However,`
 
 const MyAnswer = () => {
 	const [listPost, setListPost] = useState();
@@ -30,10 +25,36 @@ const MyAnswer = () => {
 	const [reload, setReload] = useState(false);
 	const [postSelected, setPostSelected] = useState();
 	const history = useHistory();
+	const [visibleEditModal, setVisibleEditModal] = useState(false);
 
 	useEffect(() => {
 		getListPost();
 	}, [page, orderBy, reload]);
+
+	const onFinishEditTag = async (values) => {
+		const bodyParam = {
+			"token": token,
+			"answerId": postSelected.Id,
+			"answerDetail": values.answerDetail,
+
+		}
+		try {
+			const res = await axios.post(`${URL}/answer/edit-answer`, bodyParam);
+			if (res.status === 200) {
+				console.log(res);
+				message.success("Edit answer success!");
+				setVisibleEditModal(false);
+				setReload(!reload);
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+
+	}
+
+	const onFinishFailedEditTag = (values) => {
+		console.log(values);
+	}
 
 	const getListPost = async () => {
 		setLoading(true);
@@ -42,8 +63,8 @@ const MyAnswer = () => {
 
 			if (res.status === 200) {
 				console.log(res);
-				// setListPost(res.data.result.data);
-				// setTotal(res.data.result.pagination.total);
+				setListPost(res.data.result.data);
+				setTotal(res.data.result.pagination.total);
 				setLoading(false);
 			}
 
@@ -56,10 +77,10 @@ const MyAnswer = () => {
 	const handleDeletePost = async () => {
 		const bodyParam = {
 			token: token,
-			postId: postSelected.Id,
+			answerId: postSelected.Id,
 		}
 		try {
-			const res = await axios.post(`${URL}/post/delete-post`, bodyParam);
+			const res = await axios.post(`${URL}/answer/delete-answer`, bodyParam);
 			if (res.status === 200) {
 				console.log(res);
 				message.success("Deleted!");
@@ -95,17 +116,14 @@ const MyAnswer = () => {
 							<div className={cx("oneItem")} key={id}>
 								<div className={cx("topTitle")}>
 									<div className={cx("itemTitle")} onClick={() => history.push(`/post-detail/${post.Id}`)}>
-										{post.postName.length > 100 ? post.postName.slice(0, 100) : post.postName}
+										{post.postDetail.postName.length > 100 ? post.postName.postName.slice(0, 100) : post.postDetail.postName}
 									</div>
 									<div className={cx('topTitle-right')}>
 										<div
 											className={cx("edit")}
 											onClick={() => {
-												setPostSelected(post)
-												history.push({
-													pathname: '/posts/edit-post',
-													state: { postSelected: post }
-												})
+												setPostSelected(post);
+												setVisibleEditModal(true);
 											}}
 										>
 											<EditOutlined /> Edit
@@ -121,16 +139,16 @@ const MyAnswer = () => {
 								</div>
 								<div className={cx("bottom")}>
 									<div>
-										{post.postTags?.map((it, idx) => (<Tag color="geekblue" key={idx}>{it.tagName}</Tag>))}
+										{post.postDetail.postTags.map((it, idx) => (<Tag color="geekblue" key={idx}>{it.tagName}</Tag>))}
 									</div>
 									<div className={cx("time")}>
-										{moment(post.date).format('MMMM Do YYYY hh:mm:ss a')}
+										{moment(post.postDetail.date).format('MMMM Do YYYY hh:mm:ss a')}
 									</div>
 								</div>
 								<div className={cx("topItem")}>
 									<div className={cx('topItem-left')}>
 										<div className={cx("answer")}>{post.upVoteNum} up votes</div>
-										<div className={cx("view", "answer")}>{post.upVoteNum} down votes</div>
+										<div className={cx("view", "answer")}>{post.downVoteNum} down votes</div>
 									</div>
 								</div>
 								<div className={cx("answerDetail")}>
@@ -140,10 +158,12 @@ const MyAnswer = () => {
 										</Col>
 										<Col span={18}>
 											<div className={cx("content")}>
-												{text.slice(0, 200)}
+												{/* <ReactMarkdown> */}
+												{post.answerDetail.slice(0, 200)}
+												{/* </ReactMarkdown> */}
 											</div>
 											<div>
-												<a href={`/post-detail/${1}#${2}`}>View more</a>
+												<a href={`/post-detail/${post.postDetail.Id}#${post.Id}`}>View more</a>
 											</div>
 										</Col>
 										<Col span={4} offset={1}>
@@ -159,14 +179,44 @@ const MyAnswer = () => {
 					</div>
 
 					<Modal
-						title="Delete post"
+						title="Edit answer"
+						visible={visibleEditModal}
+						footer={null}
+						onCancel={() => setVisibleEditModal(false)}
+						width={600}
+					>
+						<Form
+							name="basic"
+							onFinish={onFinishEditTag}
+							onFinishFailed={onFinishFailedEditTag}
+							layout="vertical"
+							style={{ padding: '0px 30px' }}
+							initialValues={{
+								answerDetail: postSelected?.answerDetail,
+							}}
+						>
+							<Form.Item
+								label="Answer detail"
+								name="answerDetail"
+								rules={[{ required: true, message: 'Please input answer!' }]}
+							>
+								<Input.TextArea maxLength={500} showCount rows={10} />
+							</Form.Item>
+							<Form.Item>
+								<Button type="primary" htmlType="submit">Edit</Button>
+							</Form.Item>
+						</Form>
+					</Modal>
+
+					<Modal
+						title="Delete answer"
 						visible={visibleDeleteModal}
 						onOk={handleDeletePost}
 						okText="Delete"
 						onCancel={() => setVisibleDeleteModal(false)}
 						width={360}
 					>
-						<div>Do you want to delete this post?</div>
+						<div>Do you want to delete this answer?</div>
 					</Modal>
 
 					{listPost.length > 0 ? (<div style={{ textAlign: 'right', marginTop: '20px' }}>

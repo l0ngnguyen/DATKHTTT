@@ -479,7 +479,7 @@ const Detail = () => {
 											<div style={{ fontSize: '12px' }}>{moment(answer.date).format('MMMM Do YYYY, h:mm:ss a')}</div>
 											<div className={cx("author")}>
 												<Avatar /> &nbsp; &nbsp;
-												<span>{answer?.postUserName}</span>
+												<span>{answer?.answerUserName}</span>
 											</div>
 										</Col>
 									</Row>
