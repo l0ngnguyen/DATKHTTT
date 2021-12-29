@@ -50,7 +50,7 @@ function App() {
 				<Route path="/posts/edit-post">
 					<EditPost />
 				</Route>
-				<Route path="/post-detail/:id">
+				<Route exact path="/post-detail/:id">
 					<PostDetail />
 				</Route>
 			</Switch>

@@ -298,22 +298,26 @@ const Detail = () => {
 	}
 
 	const handleCreateAnswer = async () => {
-		const bodyParam = {
-			token: token, 
-			postId: id,
-			answerDetail: markdownContent,
-		}
-
-		try {
-			const res = await axios.post(`${URL}/answer/create-answer`, bodyParam);
-			if (res.status === 200) {
-				console.log(res);
-				getPostDetail();
-				getListAnswer();
-				setMarkdownContent();
+		if (token) {
+			const bodyParam = {
+				token: token,
+				postId: id,
+				answerDetail: markdownContent,
 			}
-		} catch (err) {
-			console.log(err);
+
+			try {
+				const res = await axios.post(`${URL}/answer/create-answer`, bodyParam);
+				if (res.status === 200) {
+					console.log(res);
+					getPostDetail();
+					getListAnswer();
+					setMarkdownContent();
+				}
+			} catch (err) {
+				console.log(err);
+			}
+		} else {
+			history.push("/sign-in");
 		}
 	}
 
@@ -434,7 +438,7 @@ const Detail = () => {
 						<div className={cx("division")}></div>
 						{!listAnswer ? (<></>) :
 							listAnswer.map((answer, idx) => (
-								<div key={idx}>
+								<div key={idx} id={answer.Id}>
 									<Row>
 										<Col span={3}>
 											<div className={cx("upDown")}>
