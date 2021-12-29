@@ -10,7 +10,16 @@ const jwtHelper = require('../helpers/jwtToken')
 const Answer = require('../models/Answer')
 const AnswerVote = require('../models/AnswerVote')
 
-
+exports.getPostDetail = async function (postId) {
+    let post = await Post.getPost(postId)
+    //laasy casc tak da chen duoc
+    let postTags = await PostTag.getTagsOfPost(postId)
+    post.postTags = []
+    for (var index in postTags) {
+        post.postTags.push(await Tag.getTag(postTags[index].tagId))
+    }
+    return post
+}
 
 exports.getVoteNum = async function (req, res) {
     //lấy vote num của vote đó
@@ -181,6 +190,7 @@ exports.getTags = async function (req, res){
         })
     }
 }
+
 
 
 
