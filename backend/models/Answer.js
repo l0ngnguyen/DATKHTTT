@@ -15,10 +15,15 @@ exports.getListAnswer = (page, perPage, orderBy, orderType, startDate, endDate) 
             .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
             .andWhere('voteType', false)
             .as('downVoteNum'),
+
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            .as('answerUserName'),
     )
-    .where('date', '>=', startDate).andWhere('date', '<=', endDate)
-    .orderBy(orderBy, orderType)
-    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+        .where('date', '>=', startDate).andWhere('date', '<=', endDate)
+        .orderBy(orderBy, orderType)
+        .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
 exports.getListAnswerByUserId = (userId, page, perPage, orderBy, orderType, startDate, endDate) => {
@@ -35,11 +40,16 @@ exports.getListAnswerByUserId = (userId, page, perPage, orderBy, orderType, star
             .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
             .andWhere('voteType', false)
             .as('downVoteNum'),
+
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            .as('answerUserName'),
     )
-    .where('userId', userId)
-    .where('date', '>=', startDate).andWhere('date', '<=', endDate)
-    .orderBy(orderBy, orderType)
-    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+        .where('userId', userId)
+        .where('date', '>=', startDate).andWhere('date', '<=', endDate)
+        .orderBy(orderBy, orderType)
+        .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
 exports.getListAnswerByPostId = (postId, page, perPage, orderBy, orderType, startDate, endDate) => {
@@ -56,11 +66,15 @@ exports.getListAnswerByPostId = (postId, page, perPage, orderBy, orderType, star
             .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
             .andWhere('voteType', false)
             .as('downVoteNum'),
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            .as('answerUserName'),
     )
-    .where('postId', postId)
-    .where('date', '>=', startDate).andWhere('date', '<=', endDate)
-    .orderBy(orderBy, orderType)
-    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+        .where('postId', postId)
+        .where('date', '>=', startDate).andWhere('date', '<=', endDate)
+        .orderBy(orderBy, orderType)
+        .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
 exports.getAnswer = (answerId) => {
@@ -77,8 +91,12 @@ exports.getAnswer = (answerId) => {
             .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
             .andWhere('voteType', false)
             .as('downVoteNum'),
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            .as('answerUserName'),
     )
-    .where('Id', answerId).first()
+        .where('Id', answerId).first()
 }
 
 exports.getAnswerByUserIdAndPostId = (userId, postId) => {
@@ -95,14 +113,18 @@ exports.getAnswerByUserIdAndPostId = (userId, postId) => {
             .whereRaw('?? = ??', ['Answer_Vote.answerId', 'Answer.Id'])
             .andWhere('voteType', false)
             .as('downVoteNum'),
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Answer.userId', 'User.Id'])
+            .as('answerUserName'),
     )
-    .where('userID', userId).andWhere('postId', postId).first()
+        .where('userID', userId).andWhere('postId', postId).first()
 }
 
-exports.createAnswer = ( userId, postId, answerDetail) => {
+exports.createAnswer = (userId, postId, answerDetail) => {
     return knex('Answer').insert({
         userId: userId,
-        postId:postId,
+        postId: postId,
         answerDetail: answerDetail,
     })
 }
@@ -111,14 +133,14 @@ exports.editAnswer = (data, answerId) => {
         ...data
     })
 }
-exports.deleteAnswer =  (answerId) => {
+exports.deleteAnswer = (answerId) => {
     return knex('Answer').where('Id', answerId).del()
 }
 
-exports.deleteAnswersByPostId =  (postId) => {
+exports.deleteAnswersByPostId = (postId) => {
     return knex('Answer').where('postId', postId).del()
 }
 
-exports.deleteAnswersByUserId =  (userId) => {
+exports.deleteAnswersByUserId = (userId) => {
     return knex('Answer').where('userId', userId).del()
 }
