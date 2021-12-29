@@ -3,7 +3,7 @@ const config = require('../config/config')
 const { creteUserVote } = require('../controllers/postController')
 
 exports.getLikeNumOfPost = (postId) => {
-    return (knex("Favorite_Post").count("userId", {as: 'likeNum'}).where("postId", postId).first()
+    return (knex("Favorite_Post").count("userId", { as: 'likeNum' }).where("postId", postId).first()
     )
 }
 
@@ -16,15 +16,43 @@ exports.getFavoritePostsOfUser = (userId, page, perPage, orderBy, orderType) => 
         '*',
         knex('Favorite_Post')
             .select('date')
+            .where('Favorite_Post.userId', userId)
             .whereRaw('?? = ??', ['Post.Id', 'Favorite_Post.postId'])
             .as('addToFavoritePostDate'),
+            
+        knex('User')
+            .select('userName')
+            .whereRaw('?? = ??', ['Post.userId', 'User.Id'])
+            .as('postUserName'),
+
+        knex('Answer')
+            .count('*')
+            .whereRaw('?? = ??', ['Answer.postId', 'Post.Id'])
+            .as('numAnswer'),
+
+        knex('Post_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Post_Vote.postId', 'Post.Id'])
+            .andWhere('voteType', true)
+            .as('upVoteNum'),
+
+        knex('Post_Vote')
+            .count('*')
+            .whereRaw('?? = ??', ['Post_Vote.postId', 'Post.Id'])
+            .andWhere('voteType', false)
+            .as('downVoteNum'),
+
+        knex('Favorite_Post')
+            .count('*')
+            .whereRaw('?? = ??', ['Favorite_Post.postId', 'Post.Id'])
+            .as('likeNum'),
     )
-    .from('Post')
-    .whereIn('Post.Id', function(){
-        this.select('postId').from('Favorite_Post').where('userId', userId)
-    })
-    .orderBy(orderBy, orderType)
-    .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
+        .from('Post')
+        .whereIn('Post.Id', function () {
+            this.select('postId').from('Favorite_Post').where('userId', userId)
+        })
+        .orderBy(orderBy, orderType)
+        .paginate({ perPage: perPage, currentPage: page, isLengthAware: true })
 }
 
 
