@@ -17,6 +17,7 @@ exports.getFavoritePostsOfUser = (userId, page, perPage, orderBy, orderType) => 
         knex('Favorite_Post')
             .select('date')
             .whereRaw('?? = ??', ['Post.Id', 'Favorite_Post.postId'])
+			.where('Favorite_Post.userId', userId)
             .as('addToFavoritePostDate'),
     )
     .from('Post')
