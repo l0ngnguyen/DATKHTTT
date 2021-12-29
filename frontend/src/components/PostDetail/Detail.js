@@ -34,15 +34,17 @@ const Detail = () => {
 	const [voteAnswer, setVoteAnswer] = useState();
 	const [voteOfPost, setVoteOfPost] = useState();
 	const [answerId, setAnswerId] = useState();
-	const [like, setLike] = useState(false);
+	const [like, setLike] = useState();
 	const [voteOfAnswerById, setVoteOfAnswerById] = useState();
 	const [answerOrderBy, setAnswerOrderBy] = useState('upVoteNum');
 	const [answerOrderType, setAnswerOrderType] = useState("asc");
+	const [isLike, setIsLike] = useState();
 
 	useEffect(() => {
 		getPostDetail();
 		getVoteOfPost();
-	}, []);
+		checkLikedPost();
+	}, [isLike]);
 
 	useEffect(() => {
 		getListAnswer();
@@ -226,7 +228,41 @@ const Detail = () => {
 	}
 
 	const handleFavoritePost = async (isLike) => {
-		checkLikedPost();
+		if (isLike) {
+			addToFavoritePost();
+		} else {
+			deleteFromFavoritePost();
+		}
+	}
+
+	const addToFavoritePost = async () => {
+		const bodyParam = {
+			token: token,
+			postId: id,
+		}
+		try {
+			const res = await axios.post(`${URL}/post/user/add-favorite-post`, bodyParam);
+			if (res.status === 200) {
+				setIsLike(true);
+			}
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
+	const deleteFromFavoritePost = async () => {
+		const bodyParam = {
+			token: token,
+			postId: id,
+		}
+		try {
+			const res = await axios.post(`${URL}/post/user/delete-favorite-post`, bodyParam);
+			if (res.status === 200) {
+				setIsLike(false);
+			}
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	const checkLikedPost = async () => {
@@ -235,14 +271,13 @@ const Detail = () => {
 			postId: id,
 		}
 		try {
-			const res = await axios.get(`${URL}/post/user/get-like?postId=${id}`, {
-				headers: {
-					"X-Auth-Token": token,
-					"content-type": "application/json"
-				}
-			});
+			const res = await axios.post(`${URL}/post/user/get-like`, bodyParam);
 			if (res.status === 200) {
-				console.log(res);
+				if (res.data.result?.length > 0) {
+					setIsLike(true);
+				} else {
+					setIsLike(false);
+				}
 			}
 		} catch (err) {
 			console.log(err);
@@ -251,6 +286,7 @@ const Detail = () => {
 
 	return (
 		<div className={cx("post-detail")}>
+			{console.log("isLike", isLike)}
 			{loading ? (<Loading />) : (
 				<div className={cx("container")}>
 					<div className={cx("header")}>
@@ -311,10 +347,9 @@ const Detail = () => {
 								</div>
 								<div className={cx("favorite")}>
 									<div onClick={() => {
-										setLike(!like);
-										handleFavoritePost(!like);
+										handleFavoritePost(!isLike);
 									}}>
-										{like ? (
+										{isLike ? (
 											<HeartFilled style={{ color: '#f5222d' }} className={cx("click-icon")} />
 										) : (
 											<HeartTwoTone twoToneColor="#f5222d" className={cx("click-icon")} />
