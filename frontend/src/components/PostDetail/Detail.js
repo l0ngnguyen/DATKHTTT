@@ -37,7 +37,7 @@ const Detail = () => {
 	const [like, setLike] = useState();
 	const [voteOfAnswerById, setVoteOfAnswerById] = useState();
 	const [answerOrderBy, setAnswerOrderBy] = useState('upVoteNum');
-	const [answerOrderType, setAnswerOrderType] = useState("asc");
+	const [answerOrderType, setAnswerOrderType] = useState("desc");
 	const [isLike, setIsLike] = useState();
 
 	useEffect(() => {
@@ -297,9 +297,28 @@ const Detail = () => {
 		}
 	}
 
+	const handleCreateAnswer = async () => {
+		const bodyParam = {
+			token: token, 
+			postId: id,
+			answerDetail: markdownContent,
+		}
+
+		try {
+			const res = await axios.post(`${URL}/answer/create-answer`, bodyParam);
+			if (res.status === 200) {
+				console.log(res);
+				getPostDetail();
+				getListAnswer();
+				setMarkdownContent();
+			}
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
 	return (
 		<div className={cx("post-detail")}>
-			{console.log("isLike", isLike)}
 			{loading ? (<Loading />) : (
 				<div className={cx("container")}>
 					<div className={cx("header")}>
@@ -400,14 +419,14 @@ const Detail = () => {
 									className={cx("button", answerOrderBy === "upVoteNum" && "active")}
 									onClick={() => {
 										setAnswerOrderBy("upVoteNum");
-										setAnswerOrderType("asc");
+										setAnswerOrderType("desc");
 									}}
 								>Votes</div>
 								<div
 									className={cx("button", answerOrderBy === "date" && "active")}
 									onClick={() => {
 										setAnswerOrderBy("date");
-										setAnswerOrderType("desc");
+										setAnswerOrderType("asc");
 									}}
 								>Oldest</div>
 							</div>
@@ -488,7 +507,7 @@ const Detail = () => {
 								</div>
 							</div>
 						</div>
-						<div className={cx("btn")}>
+						<div className={cx("btn")} onClick={handleCreateAnswer}>
 							Post your answer
 						</div>
 					</div>

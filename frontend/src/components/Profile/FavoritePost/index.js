@@ -112,7 +112,7 @@ const FavoritePost = () => {
 										</div>
 									</div>
 								</div>
-								<div className={cx("itemTitle")}>
+								<div className={cx("itemTitle")} onClick={() => history.push(`/post-detail/${post.Id}`)}>
 									{post.postName.length > 100 ? post.postName.slice(0, 100) : post.postName}
 								</div>
 								<div className={cx("bottom")}>
