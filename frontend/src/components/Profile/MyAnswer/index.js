@@ -38,12 +38,12 @@ const MyAnswer = () => {
 	const getListPost = async () => {
 		setLoading(true);
 		try {
-			const res = await axios.get(`${URL}/post/list?userId=${userId}&page=${page}&perPage=${perPage}&orderBy=${orderBy}&orderType=desc`);
+			const res = await axios.get(`${URL}/answer/list?page=${page}&perPage=${perPage}&userId=${userId}&orderBy=${orderBy}&orderType=desc`);
 
 			if (res.status === 200) {
 				console.log(res);
-				setListPost(res.data.result.data);
-				setTotal(res.data.result.pagination.total);
+				// setListPost(res.data.result.data);
+				// setTotal(res.data.result.pagination.total);
 				setLoading(false);
 			}
 
@@ -143,7 +143,7 @@ const MyAnswer = () => {
 												{text.slice(0, 200)}
 											</div>
 											<div>
-												<a href={`/post-detail/${1}/#${2}`}>View more</a>
+												<a href={`/post-detail/${1}#${2}`}>View more</a>
 											</div>
 										</Col>
 										<Col span={4} offset={1}>
