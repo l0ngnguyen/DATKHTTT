@@ -138,7 +138,7 @@ exports.getAnswer = async function (req, res) {
                 message: `Cannot find answer with id = ${req.params.id}`
             })
         }
-        answer.postDetail = await postController.getPostDetail(answer.Id)
+        answer.postDetail = await postController.getPostDetail(answer.postId)
         return res.status(200).json({
             success: true,
             result: answer
@@ -197,7 +197,7 @@ exports.getAnswerList = async function (req, res) {
 
         for (var answer of answerList.data) {
             //Lấy thông tin post của từng answer
-            answer.postDetail = await postController.getPostDetail(answer.Id)
+            answer.postDetail = await postController.getPostDetail(answer.postId)
         }
 
         if (answerList.data.length == 0) {
