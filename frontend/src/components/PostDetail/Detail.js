@@ -11,6 +11,7 @@ import {
 	HeartTwoTone,
 	PlusCircleOutlined,
 	HeartFilled,
+	CheckCircleFilled,
 } from '@ant-design/icons';
 import { useHistory, useParams } from 'react-router-dom';
 import { Tag } from 'antd';
@@ -19,6 +20,7 @@ import { URL } from '../../const/index';
 import axios from "axios";
 import Loading from '../common/Loading';
 import moment from 'moment';
+import { useSelector } from 'react-redux';
 
 const cx = cn.bind(styles);
 
@@ -39,6 +41,8 @@ const Detail = () => {
 	const [answerOrderBy, setAnswerOrderBy] = useState('upVoteNum');
 	const [answerOrderType, setAnswerOrderType] = useState("desc");
 	const [isLike, setIsLike] = useState();
+	const userId = useSelector(state => state.user.userId);
+	const [acceptAnswer, setAcceptAnswer] = useState();
 
 	useEffect(() => {
 		getPostDetail();
@@ -69,6 +73,43 @@ const Detail = () => {
 			if (res.status === 200) {
 				console.log("listAn", res);
 				setListAnswer(res.data.result.data);
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+	}
+
+	const handleAcceptAnswer = async (answer) => {
+		const bodyParams = {
+			"token": token,
+			"postId": id,
+			"answerId": answer.Id,
+		}
+
+		try {
+			const res = await axios.post(`${URL}/post/set-right-answer`, bodyParams);
+			if (res.status === 200) {
+				console.log(res);
+				getListAnswer();
+				getPostDetail();
+			}
+		} catch (err) {
+			console.log(err.response);
+		}
+	}
+
+	const handleDeleteAcceptAnswer = async () => {
+		const bodyParams = {
+			"token": token,
+			"postId": id,
+		}
+
+		try {
+			const res = await axios.post(`${URL}/post/delete-right-answer`, bodyParams);
+			if (res.status === 200) {
+				console.log(res);
+				getListAnswer();
+				getPostDetail();
 			}
 		} catch (err) {
 			console.log(err.response);
@@ -464,8 +505,25 @@ const Detail = () => {
 												><CaretDownOutlined /></div>
 											</div>
 											<div className={cx("favorite")}>
-												{answer.Id === postData.rightAnswerID && <CheckCircleTwoTone twoToneColor="#52c41a" />}
+												{answer.Id === postData.rightAnswerID && <CheckCircleFilled style={{ color: '#52c41a' }} />}
 											</div>
+											{userId === answer.userId ? postData.rightAnswerID !== answer.Id ? (
+												<div
+													className={cx("buttonAccept")}
+													onClick={() => {
+														setAcceptAnswer(answer);
+														handleAcceptAnswer(answer)
+													}}
+												>Accept</div>
+											) : (
+												<div
+													className={cx("buttonDeleteAccept")}
+													onClick={() => {
+														setAcceptAnswer();
+														handleDeleteAcceptAnswer()
+													}}
+												>Don't accept</div>
+											) : (<></>)}
 										</Col>
 										<Col span={16}>
 											<div className={cx("postDetail")}>
