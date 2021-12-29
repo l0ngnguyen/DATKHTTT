@@ -8,8 +8,7 @@ const Answer = require('../models/Answer')
 const User = require('../models/User')
 const AnswerVote = require('../models/AnswerVote')
 const jwtHelper = require('../helpers/jwtToken')
-
-
+const postController = require('./postController')
 
 exports.getVoteNum = async function (req, res) {
     //lấy vote num của vote đó
@@ -46,51 +45,51 @@ exports.getVoteNum = async function (req, res) {
 exports.getUserVote = async function (req, res) {
     try {
         let answer = await Answer.getAnswer(req.body.answerId)
-        if (!answer){
+        if (!answer) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find answer with id = ${req.body.answerId}`
             })
         }
-        
+
         let userVote = await AnswerVote.getUserVoteOfAnswer(req.body.answerId, req.jwtDecoded.Id)
         return res.status(200).json({
             success: true,
             result: userVote
         })
-    
-    } catch (error){
+
+    } catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
             message: error
         })
     }
-    
+
 }
 //thêm vote mới vào post: xoá vote cũ đi nếu có rồi thêm vào)
 exports.creteUserVote = async function (req, res) {
     try {
         //check answer có còn tồn tại hay không
         let answer = await Answer.getAnswer(req.body.answerId)
-        if (!answer){
+        if (!answer) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find answer with id = ${req.body.answerId}`
             })
         }
         //xoá vote cũ trước ở post này của người dùng
-        let delVote  = await AnswerVote.deleteUserVote(req.jwtDecoded.Id, req.body.answerId)
-        let addVote = await AnswerVote.addUserVote( req.body.answerId, req.jwtDecoded.Id, req.body.voteType)
+        let delVote = await AnswerVote.deleteUserVote(req.jwtDecoded.Id, req.body.answerId)
+        let addVote = await AnswerVote.addUserVote(req.body.answerId, req.jwtDecoded.Id, req.body.voteType)
         let voteResult = await AnswerVote.getUserVoteOfAnswer(req.body.answerId, req.jwtDecoded.Id)
 
         return res.status(200).json({
             success: true,
             result: voteResult
         })
-        
+
     }
-    catch (error){
+    catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
@@ -105,22 +104,22 @@ exports.deleteUserVote = async function (req, res) {
     try {
         //check answer có còn tồn tại hay không
         let answer = await Answer.getAnswer(req.body.answerId)
-        if (!answer){
+        if (!answer) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find answer with id = ${req.body.answerId}`
             })
         }
         //xoá vote cũ trước ở answer này của người dùng
-        let delVote  = await AnswerVote.deleteUserVote(req.jwtDecoded.Id, req.body.answerId)
+        let delVote = await AnswerVote.deleteUserVote(req.jwtDecoded.Id, req.body.answerId)
 
         return res.status(200).json({
             success: true,
             result: delVote
         })
-        
+
     }
-    catch (error){
+    catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
@@ -139,6 +138,7 @@ exports.getAnswer = async function (req, res) {
                 message: `Cannot find answer with id = ${req.params.id}`
             })
         }
+        answer.postDetail = await postController.getPostDetail(answer.Id)
         return res.status(200).json({
             success: true,
             result: answer
@@ -160,7 +160,7 @@ exports.getAnswerList = async function (req, res) {
 
         let orderBy = req.query.orderBy || config.orderBy
         let orderType = req.query.orderType || config.orderType
-        
+
         let startDate = req.query.startDate ? new Date(req.query.startDate) : config.startDate
         let endDate = req.query.endDate ? new Date(req.query.endDate) : config.endDate
 
@@ -170,30 +170,35 @@ exports.getAnswerList = async function (req, res) {
 
         if (!userId && !postId) {
             answerList = await Answer.getListAnswer(page, perPage, orderBy, orderType, startDate, endDate)
-        } else if(userId && !postId){   
+        } else if (userId && !postId) {
             let user = await User.getUser(userId)
-            if (!user){
+            if (!user) {
                 return res.status(400).json({
                     success: false,
                     message: `Cannot find user with userId = ${userId}`
                 })
             }
-            
+
             answerList = await Answer.getListAnswerByUserId(userId, page, perPage, orderBy, orderType, startDate, endDate)
-        } else if (!userId && postId){
+        } else if (!userId && postId) {
             let post = await Post.getPost(postId)
-            if (!post){
+            if (!post) {
                 return res.status(400).json({
                     success: false,
                     message: `Cannot find post with userId = ${post}`
                 })
             }
 
-            answerList= await Answer.getListAnswerByPostId(postId, page, perPage, orderBy, orderType, startDate, endDate)
-            
-            let postView = await Post.editPost({viewNum: post.viewNum + 1}, postId)
+            answerList = await Answer.getListAnswerByPostId(postId, page, perPage, orderBy, orderType, startDate, endDate)
+
+            let postView = await Post.editPost({ viewNum: post.viewNum + 1 }, postId)
         }
         //lấy số upvote và downvote cho answer(cần thì viết ko thfi có rồi)
+
+        for (var answer of answerList.data) {
+            //Lấy thông tin post của từng answer
+            answer.postDetail = await postController.getPostDetail(answer.Id)
+        }
 
         if (answerList.data.length == 0) {
             return res.status(200).json({
@@ -222,7 +227,7 @@ exports.createAnswer = async function (req, res) {
     try {
         //check xem post còn tồn tại hay không
         let post = await Post.getPost(req.body.postId)
-        if (!post){
+        if (!post) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find post with id = ${req.body.postId}`
@@ -230,7 +235,7 @@ exports.createAnswer = async function (req, res) {
         }
 
         let id = await Answer.createAnswer(req.jwtDecoded.Id, req.body.postId, req.body.answerDetail);
-        
+
         if (id == 0) {
             return res.status(404).json({
                 success: false,
@@ -259,7 +264,7 @@ exports.editAnswer = async function (req, res) {
     try {
         //check answer có còn tồn tại hay không
         let answer = await Answer.getAnswer(req.body.answerId)
-        if (!answer){
+        if (!answer) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find answer with id = ${req.body.answerId}`
@@ -301,25 +306,25 @@ exports.editAnswer = async function (req, res) {
 
 exports.deleteAnswer = async function (req, res) {
     try {
-         //check answer có còn tồn tại hay không
-         let answer = await Answer.getAnswer(req.body.answerId)
-         if (!answer){
-             return res.status(400).json({
-                 success: false,
-                 message: `Can not find answer with id = ${req.body.answerId}`
-             })
-         }
-         //check xem có quyền edit post hay không: là chủ sở hữu hoặc là admin (role bằng 2 là admin)
-         if (answer.userId != req.jwtDecoded.Id && req.jwtDecoded.role != 2) {
-             return res.status(403).json({
-                 success: false,
-                 message: `You are not answer creator or admin, can not edit this answer`
-             })
-         }
+        //check answer có còn tồn tại hay không
+        let answer = await Answer.getAnswer(req.body.answerId)
+        if (!answer) {
+            return res.status(400).json({
+                success: false,
+                message: `Can not find answer with id = ${req.body.answerId}`
+            })
+        }
+        //check xem có quyền edit post hay không: là chủ sở hữu hoặc là admin (role bằng 2 là admin)
+        if (answer.userId != req.jwtDecoded.Id && req.jwtDecoded.role != 2) {
+            return res.status(403).json({
+                success: false,
+                message: `You are not answer creator or admin, can not edit this answer`
+            })
+        }
 
         // let answerVoteCount = await AnswerVote.deleteUserVoteByAnswerId(req.body.answerId)  
         let count = await Answer.deleteAnswer(req.body.answerId)
-        
+
 
         if (count == 0) {
             return res.status(404).json({
