@@ -4,19 +4,23 @@ const Tag = require('../models/Tag')
 const PostTag = require('../models/PostTag')
 const PostVote = require('../models/PostVote')
 const User = require('../models/User')
-const FavoritePost = require('../models/FavoritePost') 
+const FavoritePost = require('../models/FavoritePost')
 const config = require('../config/config')
 const jwtHelper = require('../helpers/jwtToken')
 const Answer = require('../models/Answer')
 const AnswerVote = require('../models/AnswerVote')
 
 exports.getPostDetail = async function (postId) {
+
     let post = await Post.getPost(postId)
     //laasy casc tak da chen duoc
     let postTags = await PostTag.getTagsOfPost(postId)
+
     post.postTags = []
-    for (var index in postTags) {
-        post.postTags.push(await Tag.getTag(postTags[index].tagId))
+    if (postTags.length != 0) {
+        for (var index in postTags) {
+            post.postTags.push(await Tag.getTag(postTags[index].tagId))
+        }
     }
     return post
 }
@@ -80,7 +84,7 @@ exports.getLikeNum = async function (req, res) {
 exports.getUserVote = async function (req, res) {
     try {
         let post = await Post.getPost(req.body.postId)
-        if (!post){
+        if (!post) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find post with id = ${req.body.postId}`
@@ -91,39 +95,39 @@ exports.getUserVote = async function (req, res) {
             success: true,
             result: userVote
         })
-    
-    } catch (error){
+
+    } catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
             message: error
         })
     }
-    
+
 }
 //thêm vote mới vào post: xoá vote cũ đi nếu có rồi thêm vào)
 exports.creteUserVote = async function (req, res) {
     try {
         //check xem post còn tồn tại hay không
         let post = await Post.getPost(req.body.postId)
-        if (!post){
+        if (!post) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find post with id = ${req.body.postId}`
             })
         }
         //xoá vote cũ trước ở post này của người dùng
-        let delVote  = await PostVote.deleteUserVote(req.jwtDecoded.Id, req.body.postId)
-        let addVote = await PostVote.addUserVote( req.body.postId, req.jwtDecoded.Id, req.body.voteType)
+        let delVote = await PostVote.deleteUserVote(req.jwtDecoded.Id, req.body.postId)
+        let addVote = await PostVote.addUserVote(req.body.postId, req.jwtDecoded.Id, req.body.voteType)
         let voteResult = await PostVote.getUserVoteOfPost(req.body.postId, req.jwtDecoded.Id)
 
         return res.status(200).json({
             success: true,
             result: voteResult
         })
-        
+
     }
-    catch (error){
+    catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
@@ -138,22 +142,22 @@ exports.deleteUserVote = async function (req, res) {
     try {
         //check xem post còn tồn tại hay không
         let post = await Post.getPost(req.body.postId)
-        if (!post){
+        if (!post) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find post with id = ${req.body.postId}`
             })
         }
         //xoá vote cũ trước ở post này của người dùng
-        let delVote  = await PostVote.deleteUserVote(req.jwtDecoded.Id, req.body.postId)
+        let delVote = await PostVote.deleteUserVote(req.jwtDecoded.Id, req.body.postId)
 
         return res.status(200).json({
             success: true,
             result: delVote
         })
-        
+
     }
-    catch (error){
+    catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
@@ -163,10 +167,10 @@ exports.deleteUserVote = async function (req, res) {
 }
 
 
-exports.getTags = async function (req, res){
+exports.getTags = async function (req, res) {
     try {
         let post = await Post.getPost(req.query.postId)
-        if (!post){
+        if (!post) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find post with id = ${req.query.postId}`
@@ -182,7 +186,7 @@ exports.getTags = async function (req, res){
             success: true,
             result: listTag
         })
-    } catch (error){
+    } catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
@@ -241,7 +245,7 @@ exports.getPostList = async function (req, res) {
             postList = await Post.getListPost(page, perPage, orderBy, orderType, startDate, endDate)
         } else {
             let user = await User.getUser(userId)
-            if (!user){
+            if (!user) {
                 return res.status(400).json({
                     success: false,
                     message: `Cannot find user with userId = ${userId}`
@@ -342,7 +346,7 @@ exports.createPost = async function (req, res) {
             try {
                 let count = await PostTag.addTagToPost(post.Id, req.body.postTags[index])
             }
-            catch(error){
+            catch (error) {
                 message.push(`Can not add tag with id = ${req.body.postTags[index]}, tag does not exist`)
                 continue;
             }
@@ -507,7 +511,7 @@ exports.setRightAnswer = async function (req, res) {
                 message: `Cannot find answer with id = ${req.body.answerId}`
             })
         }
-        if (answer.postId != req.body.postId){
+        if (answer.postId != req.body.postId) {
             return res.status(400).json({
                 success: false,
                 message: `Cannot set answer of another post for this post`
@@ -601,20 +605,20 @@ exports.getFavoritePosts = async function (req, res) {
         let userId = req.jwtDecoded.Id
 
         let user = await User.getUser(userId)
-            if (!user){
-                return res.status(400).json({
-                    success: false,
-                    message: `Cannot find user with userId = ${userId}`
-                })
-            }
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot find user with userId = ${userId}`
+            })
+        }
 
-        let favoritePosts  = await FavoritePost.getFavoritePostsOfUser(userId, page, perPage, orderBy, orderType)
+        let favoritePosts = await FavoritePost.getFavoritePostsOfUser(userId, page, perPage, orderBy, orderType)
         return res.status(200).json({
             success: true,
             result: favoritePosts
         })
 
-    }catch (error){
+    } catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
@@ -627,7 +631,7 @@ exports.getFavoritePosts = async function (req, res) {
 exports.getUserLike = async function (req, res) {
     try {
         let post = await Post.getPost(req.body.postId)
-        if (!post){
+        if (!post) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find post with id = ${req.body.postId}`
@@ -638,15 +642,15 @@ exports.getUserLike = async function (req, res) {
             success: true,
             result: userLike
         })
-    
-    } catch (error){
+
+    } catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
             message: error
         })
     }
-    
+
 }
 //thêm post vào sanh sách  favorite post
 
@@ -655,24 +659,24 @@ exports.addPostToFavorite = async function (req, res) {
     try {
         //check xem post còn tồn tại hay không
         let post = await Post.getPost(req.body.postId)
-        if (!post){
+        if (!post) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find post with id = ${req.body.postId}`
             })
         }
         //xoá like cũ trước ở post này của người dùng
-        let delFavoritePost  = await FavoritePost.deletePostFromFavorite(req.jwtDecoded.Id, req.body.postId)
-        let addFavoritePost = await FavoritePost.addPostToFavorite( req.body.postId, req.jwtDecoded.Id)
+        let delFavoritePost = await FavoritePost.deletePostFromFavorite(req.jwtDecoded.Id, req.body.postId)
+        let addFavoritePost = await FavoritePost.addPostToFavorite(req.body.postId, req.jwtDecoded.Id)
         let likeResult = await FavoritePost.getUserLikeOfPost(req.body.postId, req.jwtDecoded.Id)
 
         return res.status(200).json({
             success: true,
             result: likeResult
         })
-        
+
     }
-    catch (error){
+    catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
@@ -687,22 +691,22 @@ exports.deletePostToFavorite = async function (req, res) {
     try {
         //check xem post còn tồn tại hay không
         let post = await Post.getPost(req.body.postId)
-        if (!post){
+        if (!post) {
             return res.status(400).json({
                 success: false,
                 message: `Can not find post with id = ${req.body.postId}`
             })
         }
         //xoá like cũ trước ở post này của người dùng
-        let delFavoritePost  = await FavoritePost.deletePostFromFavorite(req.jwtDecoded.Id, req.body.postId)
+        let delFavoritePost = await FavoritePost.deletePostFromFavorite(req.jwtDecoded.Id, req.body.postId)
 
         return res.status(200).json({
             success: true,
             result: delFavoritePost
         })
-        
+
     }
-    catch (error){
+    catch (error) {
         console.log(error)
         return res.status(500).json({
             success: false,
