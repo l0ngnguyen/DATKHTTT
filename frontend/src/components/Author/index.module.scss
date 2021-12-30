@@ -1,0 +1,109 @@
+.admin {
+  padding-top: 120px;
+  padding-bottom: 60px;
+
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .left {
+        display: flex;
+        align-items: baseline;
+
+        .title {
+          font-weight: bold;
+          font-size: 36px;
+          color: #000000;
+          margin-right: 12px;
+        }
+
+        .subTitle {
+          font-weight: bold;
+          font-size: 18px;
+          line-height: 21px;
+          color: #007cf0;
+        }
+      }
+
+      .filterButton {
+        background: #ffffff;
+        border: 1px solid #007cf0;
+        box-sizing: border-box;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 48px;
+        user-select: none;
+
+        .active {
+          background-color: #007cf0;
+          color: #ffffff;
+          height: 102%;
+          border-radius: 25px;
+        }
+
+        &-left {
+          padding: 12px 25px 12px 25px;
+          border-radius: 25px 0px 0px 25px;
+          transition-duration: 0.35s;
+          cursor: pointer;
+          border-radius: 25px;
+        }
+
+        &-middle {
+          padding: 12px 25px;
+          transition-duration: 0.35s;
+          cursor: pointer;
+          border-radius: 25px;
+        }
+
+        &-right {
+          padding: 12px 25px 12px 25px;
+          border-radius: 0px 25px 25px 0px;
+          transition-duration: 0.35s;
+          cursor: pointer;
+          border-radius: 25px;
+        }
+      }
+
+      .right {
+        display: flex;
+        align-items: center;
+
+        .search {
+          width: 240px;
+          margin-right: 36px;
+          font-size: 12px;
+        }
+
+        .button {
+          background: #000000;
+          border-radius: 25px;
+          padding: 9px 20px;
+          color: #ffffff;
+          font-size: 16px;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .body {
+      margin-top: 30px;
+
+      .card {
+        cursor: pointer;
+        transition-duration: 0.35s;
+		
+        &:hover {
+          box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.12);
+        }
+      }
+    }
+  }
+}

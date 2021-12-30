@@ -78,9 +78,6 @@ const Tags = () => {
                                     className={cx("search")}
                                     size="large"
                                 />
-                                {/* <div className={cx("button")}>
-                                    <PlusCircleOutlined />  Create New Tag
-                                </div> */}
                             </div>
                         </div>
                         <div style={{ fontSize: '12px', width: '45%', padding: '10px 0px 0px 10px' }}>A tag is a keyword or label that

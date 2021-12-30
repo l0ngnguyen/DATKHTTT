@@ -18,6 +18,7 @@ import Post from "./components/Posts";
 import CreatePost from "./components/Posts/CreatePost/CreatePost";
 import EditPost from "./components/Posts/EditPost";
 import PostDetail from "./components/PostDetail";
+import Author from "./components/Author";
 
 function App() {
 	return (
@@ -52,6 +53,9 @@ function App() {
 				</Route>
 				<Route exact path="/post-detail/:id">
 					<PostDetail />
+				</Route>
+				<Route exact path="/user">
+					<Author />
 				</Route>
 			</Switch>
 		</Router>
