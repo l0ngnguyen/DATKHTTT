@@ -32,7 +32,7 @@ const FavoritePost = () => {
 	const getListPost = async () => {
 		setLoading(true);
 		try {
-			const res = await axios.get(`${URL}/post/user/get-favorite-posts?&page=${page}&perPage=${perPage}&orderBy=${orderBy}&orderType='desc'`, {
+			const res = await axios.get(`${URL}/post/user/get-favorite-posts?&page=${page}&perPage=${perPage}&orderBy=${orderBy}&orderType=desc`, {
 				headers: {
 					'x-access-token': token,
 				}
