@@ -7,6 +7,7 @@ import axios from 'axios';
 import { URL } from '../../const/index';
 import Loading from '../common/Loading/index';
 import moment from 'moment';
+import { useHistory } from 'react-router-dom';
 
 const cx = cn.bind(styles);
 
@@ -17,6 +18,7 @@ const Author = () => {
 	const [orderType, setOrderType] = useState("desc");
 	const [loading, setLoading] = useState(true);
 	const [userData, setUserData] = useState();
+	const history = useHistory();
 
 	useEffect(() => {
 		getUser();
@@ -71,7 +73,9 @@ const Author = () => {
 							<Row gutter={[32, 32]}>
 								{userData?.map((item, idx) => (
 									<Col span={6} key={idx}>
-										<Card className={cx("card")}>
+										<Card className={cx("card")}
+										onClick={() => history.push(`/user/user-info/${item.Id}`)}
+										>
 											<Row>
 												<Col span={6}>
 													<Avatar src={`http://localhost:3001/${item.avatarLink}`} size="large" />

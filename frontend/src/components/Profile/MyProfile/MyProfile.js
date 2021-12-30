@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Statistic, Card, Row, Col } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import styles from "./MyProfile.module.scss";
 import cn from "classnames/bind";
 import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 const cx = cn.bind(styles);
 
 const MyProfile = () => {
-    const userInfo = useSelector(state => state.user.info);
+	const userInfo = useSelector(state => state.user.info);
+	
     return (
         <div className={cx("my-profile")}>
             <Row gutter={[24, 0]}>
@@ -18,20 +21,20 @@ const MyProfile = () => {
                         <Row gutter={[24, 24]}>
                             <Col span={12}>
                                 <Statistic
-                                    title="Reputation"
-                                    value={100289}
+                                    title="Posts"
+                                    value={userInfo?.numPost}
                                 />
                             </Col>
                             <Col span={12}>
                                 <Statistic
                                     title="Answers"
-                                    value={960}
+                                    value={userInfo?.numAnswer}
                                 />
                             </Col>
                             <Col span={12}>
                                 <Statistic
                                     title="Up votes"
-                                    value={11280}
+                                    value={userInfo?.numUpVotePost + userInfo?.numUpVoteAnswer}
                                     valueStyle={{ color: '#3f8600' }}
                                     prefix={<ArrowUpOutlined />}
                                 />
@@ -39,31 +42,23 @@ const MyProfile = () => {
                             <Col span={12}>
                                 <Statistic
                                     title="Down votes"
-                                    value={330}
+                                    value={userInfo?.numDownVotePost + userInfo?.numDownVoteAnswer}
                                     valueStyle={{ color: '#cf1322' }}
                                     prefix={<ArrowDownOutlined />}
                                 />
                             </Col>
                         </Row>
                     </div>
-                    <div className={cx("title")}>Badges</div>
-                    <div className={cx("card")}>
-                        Coming soon!
-                    </div>
                 </Col>
                 <Col span={16}>
                     <div className={cx("title")}>About</div>
                     <div className={cx("card")} style={{ fontSize: '16px' }}>
-                        <div><b>Username: </b> {userInfo.userName}</div>
-                        <div><b>Email: </b> {userInfo.email}</div>
-                        <div><b>Location: </b> {userInfo.location}</div>
-                        <div><b>Github link: </b> {userInfo.githubLink}</div>
-                        <div><b>Facebook link: </b> {userInfo.facebookLink}</div>
-                        <div><b>Description: </b> {userInfo.description}</div>
-                    </div>
-                    <div className={cx("title")}>Top answers</div>
-                    <div className={cx("card")}>
-                        You hasn’t answered yet
+                        <div><b>Username: </b> {userInfo?.userName}</div>
+                        <div><b>Email: </b> {userInfo?.email}</div>
+                        <div><b>Location: </b> {userInfo?.location}</div>
+                        <div><b>Github link: </b> {userInfo?.githubLink}</div>
+                        <div><b>Facebook link: </b> {userInfo?.facebookLink}</div>
+                        <div><b>Description: </b> {userInfo?.description}</div>
                     </div>
                 </Col>
             </Row>

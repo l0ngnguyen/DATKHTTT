@@ -1,0 +1,18 @@
+.my-profile {
+    .title {
+        font-weight: normal;
+        font-size: 24px;
+        color: #000000;
+    }
+
+    .card {
+        background: #FFFFFF;
+        border: 1px solid #e4e4e4;
+        box-sizing: border-box;
+        // box-shadow: 4px 8px 20px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+        width: 100%;
+        padding: 20px;
+        margin: 10px 0px 40px 0px;
+    }
+}
